@@ -1,18 +1,19 @@
 package pl.edu.pk.student.kittysecurity.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pk.student.kittysecurity.entity.User;
-import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 import pl.edu.pk.student.kittysecurity.services.UserService;
 
-@RestController
-public class AuthController {
+import java.util.List;
 
+@RestController
+public class UserController {
     UserService userService;
 
-    public AuthController(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -22,7 +23,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody User user){
-        return user;
+    public String login(@RequestBody User user){
+        return userService.verify(user);
+    }
+
+    @GetMapping("/students")
+    public List<User> getStudents(){
+        return userService.getAllStudents();
     }
 }
