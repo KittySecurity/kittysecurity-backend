@@ -1,10 +1,13 @@
 package pl.edu.pk.student.kittysecurity.services;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.edu.pk.student.kittysecurity.dto.LoginResponseDTO;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 
@@ -30,15 +33,19 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public String verify(User user){
+    public ResponseEntity<LoginResponseDTO> verify(User user){
         Authentication authentication = authManager.
                 authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         if(authentication.isAuthenticated())
-            return jwtService.generateToken(user.getUsername());
-        return "Failed";
+            return ResponseEntity.ok()
+                    .body(new LoginResponseDTO("Login successful", jwtService.generateToken(user.getUsername())));
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new LoginResponseDTO("Login Unsuccessful", ""));
     }
 
-    public List<User> getAllStudents() {
+    public List<User> getAllUsers() {
         return userRepo.findAll();
     }
 }
