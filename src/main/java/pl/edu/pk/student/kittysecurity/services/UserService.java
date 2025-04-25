@@ -28,15 +28,15 @@ public class UserService {
         this.jwtService = jwt;
     }
 
-    public User register(User user){
+    public User register(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
 
-    public ResponseEntity<LoginResponseDTO> verify(User user){
+    public ResponseEntity<LoginResponseDTO> verify(User user) {
         Authentication authentication = authManager.
                 authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-        if(authentication.isAuthenticated())
+        if (authentication.isAuthenticated())
             return ResponseEntity.ok()
                     .body(new LoginResponseDTO("Login successful", jwtService.generateToken(user.getUsername())));
 
