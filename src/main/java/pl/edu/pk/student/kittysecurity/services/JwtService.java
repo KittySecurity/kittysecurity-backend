@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,8 +21,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private static final long JWT_TOKEN_VALIDITY_MS = 900_000; // 15 minutes
     private final String secretKey;
-    //private final String publicKey;
 
     public JwtService() {
         try {
@@ -34,12 +35,13 @@ public class JwtService {
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        Instant now = Instant.now();
         return Jwts.builder()
                 .addClaims(claims)
                 .setSubject(username)
                 .setHeaderParam("typ", "JWT")
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .setIssuedAt(new Date())
+                .setExpiration(Date.from(now.plusMillis(JWT_TOKEN_VALIDITY_MS)))
+                .setIssuedAt(Date.from(now))
                 .signWith(getKey())
                 .compact();
     }
@@ -49,7 +51,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String retrieveUsername(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -67,7 +69,7 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = retrieveUsername(token);
+        final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

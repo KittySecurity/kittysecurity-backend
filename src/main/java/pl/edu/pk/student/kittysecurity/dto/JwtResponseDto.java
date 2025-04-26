@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponseDTO {
+public class JwtResponseDto {
     private String message;
+    private String access_token_type;
     private String access_token;
+    private String refresh_token;
 }

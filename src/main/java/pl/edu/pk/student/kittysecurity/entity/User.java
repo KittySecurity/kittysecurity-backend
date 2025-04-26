@@ -13,8 +13,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -38,16 +39,20 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Role> roles;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private Date createdAt;
+    private Instant createdAt;
 
     @UpdateTimestamp
-    private Date updatedAt;
+    private Instant updatedAt;
 
     @JsonIgnore
     @Override
