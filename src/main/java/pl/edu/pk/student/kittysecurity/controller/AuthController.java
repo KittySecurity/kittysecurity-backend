@@ -3,7 +3,9 @@ package pl.edu.pk.student.kittysecurity.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.RefreshTokenRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
 
@@ -20,13 +22,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return authService.register(user);
+    public User register(@RequestBody RegisterRequestDto request) {
+        return authService.register(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> login(@RequestBody User user) {
-        return authService.verify(user);
+    public ResponseEntity<JwtResponseDto> login(@RequestBody LoginRequestDto request) {
+        return authService.verify(request);
     }
 
     @PostMapping("/logout")

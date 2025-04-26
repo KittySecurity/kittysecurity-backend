@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
@@ -33,19 +35,23 @@ public class AuthService {
         this.refreshTokenService = refreshTokenService;
     }
 
-    public User register(User user) {
+    public User register(RegisterRequestDto registerDto) {
+        User user = new User();
+        user.setUsername(registerDto.getUsername());
+        user.setPassword(encoder.encode(registerDto.getPassword()));
+
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
 
     //TODO: HANDLE EXCEPTION AND REMOVE SECOND RETURN
-    public ResponseEntity<JwtResponseDto> verify(User user) {
+    public ResponseEntity<JwtResponseDto> verify(LoginRequestDto request) {
         Authentication authentication = authManager.
-                authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+                authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok()
                     .body(new JwtResponseDto("Login successful", "Bearer",
-                            jwtService.generateToken(user.getUsername()), refreshTokenService.createRefreshToken(user.getUsername()).getToken()));
+                            jwtService.generateToken(request.getUsername()), refreshTokenService.createRefreshToken(request.getUsername()).getToken()));
         }
 
         return ResponseEntity
