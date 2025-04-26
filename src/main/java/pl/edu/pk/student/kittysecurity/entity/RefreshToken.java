@@ -14,7 +14,12 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String token;
+    private String prefix;
+
+    private String hashedToken;
+    
+    @Transient
+    private String rawToken;
 
     @Column(nullable = false)
     private Instant expiresAt;

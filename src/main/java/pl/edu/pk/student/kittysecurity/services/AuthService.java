@@ -50,21 +50,21 @@ public class AuthService {
                 authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok()
-                    .body(new JwtResponseDto("Login successful", "Bearer",
-                            jwtService.generateToken(request.getUsername()), refreshTokenService.createRefreshToken(request.getUsername()).getToken()));
+                    .body(new JwtResponseDto("Bearer",
+                            jwtService.generateToken(request.getUsername()), refreshTokenService.createRefreshToken(request.getUsername()).getRawToken()));
         }
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new JwtResponseDto("Login Unsuccessful", "", "", ""));
+                .body(new JwtResponseDto( "", "", ""));
     }
 
     public ResponseEntity<JwtResponseDto> refreshToken(String token) {
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(token);
 
         return ResponseEntity.ok()
-                .body(new JwtResponseDto("Login successful", "Bearer",
-                        jwtService.generateToken(newRefreshToken.getUser().getUsername()), newRefreshToken.getToken()));
+                .body(new JwtResponseDto("Bearer",
+                        jwtService.generateToken(newRefreshToken.getUser().getUsername()), newRefreshToken.getRawToken()));
     }
 
     public void revokeToken(String token) {
