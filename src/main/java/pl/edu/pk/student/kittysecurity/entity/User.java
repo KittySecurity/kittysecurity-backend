@@ -3,10 +3,7 @@ package pl.edu.pk.student.kittysecurity.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,6 +19,7 @@ import java.util.List;
 @Table(name = "Users")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -43,7 +41,7 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Role> roles;
 
@@ -53,6 +51,13 @@ public class User implements UserDetails {
 
     @UpdateTimestamp
     private Instant updatedAt;
+
+    public User(Integer id, String email, String username, String password) {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 
     @JsonIgnore
     @Override
