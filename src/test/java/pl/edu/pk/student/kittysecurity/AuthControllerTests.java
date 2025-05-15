@@ -1,6 +1,5 @@
 package pl.edu.pk.student.kittysecurity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +46,6 @@ public class AuthControllerTests {
     @InjectMocks
     private AuthController authController;
 
-    private final User USER_2 = new User(2,"user2@mail.com","user2","123");
-
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
@@ -57,7 +54,7 @@ public class AuthControllerTests {
 
 
     @Test
-    public void registerUserSuccess() throws Exception {
+    public void shouldReturnUserDataWhenRegistered() throws Exception {
         User USER_1 = new User(1,"exampleuser@examplemail.com", "exampleusername", "Password123");
 
         RegisterRequestDto request = RegisterRequestDto.builder()
