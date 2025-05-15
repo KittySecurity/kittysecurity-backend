@@ -17,7 +17,7 @@ import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 import java.util.List;
 
 @Service
-public class AuthService {
+public class  AuthService {
     private final String DEFAULT_ROLE = "USER";
 
     private final UserRepository userRepo;

@@ -1,5 +1,6 @@
 package pl.edu.pk.student.kittysecurity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,11 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.edu.pk.student.kittysecurity.controller.AuthController;
+import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.RefreshTokenRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
@@ -53,11 +58,11 @@ public class AuthControllerTests {
 
     @Test
     public void registerUserSuccess() throws Exception {
-        User USER_1 = new User(1,"exampleuser@examplemail.com", "exampleusername", "password123");
+        User USER_1 = new User(1,"exampleuser@examplemail.com", "exampleusername", "Password123");
 
         RegisterRequestDto request = RegisterRequestDto.builder()
                                                         .email("exampleuser@examplemail.com")
-                                                        .password("examplepassword")
+                                                        .password("Password123")
                                                         .username("exampleusername")
                                                         .build();
 
@@ -73,7 +78,83 @@ public class AuthControllerTests {
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.username", is("exampleusername")));
+                .andExpect(jsonPath("$.username", is("exampleusername")))
+                .andExpect(jsonPath("$.email", is("exampleuser@examplemail.com")))
+                .andExpect(jsonPath("$.password", is("Password123")));
     }
 
+    @Test
+    public void shouldReturnJwtResponseWhenLoginWithValidCredentials() throws Exception {
+
+        JwtResponseDto response = JwtResponseDto.builder()
+                .accessToken("12345")
+                .accessTokenType("Bearer")
+                .refreshToken("54321")
+                .build();
+
+        LoginRequestDto request = LoginRequestDto.builder()
+                .username("testuser")
+                .password("testpassword")
+                .build();
+
+        Mockito.when(authService.verify(Mockito.any(LoginRequestDto.class))).thenReturn(ResponseEntity.ok().body(response));
+
+        String content = objectWriter.writeValueAsString(request);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.accessToken", is("12345")))
+                .andExpect(jsonPath("$.accessTokenType", is("Bearer")))
+                .andExpect(jsonPath("$.refreshToken", is("54321")));
+    }
+
+    @Test
+    public void shouldRevokeTokenSuccessfully() throws Exception {
+        RefreshTokenRequestDto request = RefreshTokenRequestDto.builder()
+                .token("dummy-refresh-token")
+                .build();
+
+        Mockito.doNothing().when(authService).revokeToken(Mockito.anyString());
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request));
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnJwtResponseWhenRefreshingToken() throws Exception {
+        RefreshTokenRequestDto request = RefreshTokenRequestDto.builder()
+                .token("dummy-refresh-token")
+                .build();
+
+        JwtResponseDto response = JwtResponseDto.builder()
+                .accessToken("new-access-token")
+                .accessTokenType("Bearer")
+                .refreshToken("new-refresh-token")
+                .build();
+
+        Mockito.when(authService.refreshToken(Mockito.anyString()))
+                .thenReturn(ResponseEntity.ok(response));
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/refreshToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request));
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken", is("new-access-token")))
+                .andExpect(jsonPath("$.accessTokenType", is("Bearer")))
+                .andExpect(jsonPath("$.refreshToken", is("new-refresh-token")));
+    }
 }

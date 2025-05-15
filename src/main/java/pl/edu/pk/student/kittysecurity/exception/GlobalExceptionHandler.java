@@ -2,6 +2,7 @@ package pl.edu.pk.student.kittysecurity.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,8 +27,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.unprocessableEntity().body(errors);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleAuthenticationException(BadCredentialsException ex) {
         return ResponseEntity.unprocessableEntity().body(ex.getMessage());
     }
 

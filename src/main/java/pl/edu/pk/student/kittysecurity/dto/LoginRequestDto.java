@@ -1,15 +1,16 @@
 package pl.edu.pk.student.kittysecurity.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class LoginRequestDto {
+    @NotBlank(message = "Username cannot be blank!")
     private String username;
+    @NotBlank(message = "Password cannot be blank!")
     private String password;
 }

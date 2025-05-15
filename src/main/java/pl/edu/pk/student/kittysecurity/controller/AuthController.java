@@ -28,14 +28,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> login(@RequestBody LoginRequestDto request) {
+    public ResponseEntity<JwtResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
         return authService.verify(request);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> revokeToken(@RequestBody RefreshTokenRequestDto request) {
         authService.revokeToken(request.getToken());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refreshToken")
