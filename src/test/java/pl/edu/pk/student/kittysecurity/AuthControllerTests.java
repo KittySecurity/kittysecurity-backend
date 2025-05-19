@@ -52,8 +52,6 @@ public class AuthControllerTests {
 
     @Test
     public void shouldReturnUserDataWhenRegistered() throws Exception {
-        User USER_1 = new User(1,"exampleuser@examplemail.com", "exampleusername", "Password123");
-
         RegisterRequestDto request = RegisterRequestDto.builder()
                                                         .email("exampleuser@examplemail.com")
                                                         .masterHash("Password123")

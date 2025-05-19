@@ -22,7 +22,6 @@ public class  AuthService {
     private final String DEFAULT_ROLE = "USER";
 
     private final UserRepository userRepo;
-    private final BCryptPasswordEncoder encoder;
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
@@ -66,7 +65,7 @@ public class  AuthService {
         return User.builder()
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
-                .masterHash(registerDto.getMasterHash()) //encoder.encode()
+                .masterHash(registerDto.getMasterHash())
                 .build();
     }
 
