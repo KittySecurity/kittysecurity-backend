@@ -3,7 +3,7 @@ package pl.edu.pk.student.kittysecurity.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pk.student.kittysecurity.dto.*;
+import pl.edu.pk.student.kittysecurity.dto.auth.*;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
 

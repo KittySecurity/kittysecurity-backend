@@ -31,8 +31,8 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(nullable = false, unique = true, name = "USERNAME")
+    private String displayName;
 
     @Column(nullable = false)
     private String masterHash;

@@ -5,10 +5,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
-import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RegisterResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.auth.JwtResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.auth.LoginRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.auth.RegisterRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.auth.RegisterResponseDto;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.Role;
 import pl.edu.pk.student.kittysecurity.entity.User;
@@ -55,7 +55,7 @@ public class  AuthService {
     }
 
     private void checkIfUserExists(String username, String email) throws UserAlreadyExistsException {
-        if(userRepo.findByUsername(username).isPresent())
+        if(userRepo.findByDisplayName(username).isPresent())
             throw new UserAlreadyExistsException("Username is taken!");
 
         if(userRepo.findByEmail(email).isPresent())
@@ -64,7 +64,7 @@ public class  AuthService {
 
     private User createUser(RegisterRequestDto registerDto){
         return User.builder()
-                .username(registerDto.getUsername())
+                .displayName(registerDto.getUsername())
                 .email(registerDto.getEmail())
                 .masterHash(encoder.encode(registerDto.getMasterHash()))
                 .build();
