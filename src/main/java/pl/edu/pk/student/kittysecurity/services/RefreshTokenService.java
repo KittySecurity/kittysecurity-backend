@@ -10,6 +10,7 @@ import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,9 +31,9 @@ public class RefreshTokenService {
         this.encoder = encoder;
     }
 
-    public RefreshToken createRefreshToken(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public RefreshToken createRefreshToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
         RefreshToken refreshToken = buildToken(user);
         refreshTokenRepository.save(refreshToken);
