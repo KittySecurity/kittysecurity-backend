@@ -1,16 +1,14 @@
 package pl.edu.pk.student.kittysecurity.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class JwtResponseDto {
-    private String access_token_type;
-    private String access_token;
-    private String refresh_token;
+    private String accessTokenType;
+    private String accessToken;
+    private String refreshToken;
 }

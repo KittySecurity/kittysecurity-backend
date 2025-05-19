@@ -1,5 +1,6 @@
 package pl.edu.pk.student.kittysecurity.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
@@ -22,19 +23,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequestDto request) {
+    public User register(@RequestBody @Valid RegisterRequestDto request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponseDto> login(@RequestBody LoginRequestDto request) {
+    public ResponseEntity<JwtResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
         return authService.verify(request);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> revokeToken(@RequestBody RefreshTokenRequestDto request) {
         authService.revokeToken(request.getToken());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refreshToken")
