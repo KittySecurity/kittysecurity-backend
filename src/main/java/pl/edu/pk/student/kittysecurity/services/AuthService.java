@@ -22,6 +22,7 @@ public class  AuthService {
     private final String DEFAULT_ROLE = "USER";
 
     private final UserRepository userRepo;
+    private final BCryptPasswordEncoder encoder;
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
@@ -30,6 +31,7 @@ public class  AuthService {
                        BCryptPasswordEncoder bCryptPasswordEncoder, JwtService jwt,
                        RefreshTokenService refreshTokenService) {
         this.userRepo = userRepo;
+        this.encoder = bCryptPasswordEncoder;
         this.authManager = authManager;
         this.jwtService = jwt;
         this.refreshTokenService = refreshTokenService;
@@ -64,7 +66,7 @@ public class  AuthService {
         return User.builder()
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
-                .masterHash(registerDto.getMasterHash())
+                .masterHash(encoder.encode(registerDto.getMasterHash()))
                 .build();
     }
 
@@ -78,23 +80,36 @@ public class  AuthService {
     }
 
     public ResponseEntity<JwtResponseDto> verify(LoginRequestDto request) {
-        String username = request.getUsername();
-        String password = request.getPassword();
+        String email = request.getEmail();
+        String masterHash = request.getMasterHash();
 
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(email, masterHash));
+
+        String jwtToken = jwtService.generateToken(email);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
 
         return ResponseEntity.ok()
-                .body(new JwtResponseDto("Bearer",
-                        jwtService.generateToken(username),
-                        refreshTokenService.createRefreshToken(username).getRawToken()));
+                .body(JwtResponseDto.builder()
+                        .accessToken(jwtToken)
+                        .accessTokenType("Bearer")
+                        .accessTokenExpiresIn(jwtService.extractExpiration(jwtToken).getTime())
+                        .refreshToken(refreshToken.getRawToken())
+                        .refreshTokenExpiresIn(refreshToken.getExpiresAt().toEpochMilli())
+                        .build());
     }
 
     public ResponseEntity<JwtResponseDto> refreshToken(String token) {
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(token);
+        String jwtToken = jwtService.generateToken(newRefreshToken.getUser().getEmail());
 
         return ResponseEntity.ok()
-                .body(new JwtResponseDto("Bearer",
-                        jwtService.generateToken(newRefreshToken.getUser().getUsername()), newRefreshToken.getRawToken()));
+                .body(JwtResponseDto.builder()
+                        .accessToken(jwtToken)
+                        .accessTokenType("Bearer")
+                        .accessTokenExpiresIn(jwtService.extractExpiration(jwtToken).getTime())
+                        .refreshToken(newRefreshToken.getRawToken())
+                        .refreshTokenExpiresIn(newRefreshToken.getExpiresAt().toEpochMilli())
+                        .build());
     }
 
     public void revokeToken(String token) {
