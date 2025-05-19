@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.RegisterResponseDto;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.Role;
 import pl.edu.pk.student.kittysecurity.entity.User;
@@ -36,13 +37,21 @@ public class  AuthService {
         this.refreshTokenService = refreshTokenService;
     }
 
-    public User register(RegisterRequestDto registerDto) {
+    public ResponseEntity<RegisterResponseDto> register(RegisterRequestDto registerDto) {
+        String newUserEmail = registerDto.getEmail();
+        String newUserUsername = registerDto.getUsername();
 
-        checkIfUserExists(registerDto.getUsername(), registerDto.getEmail());
-        User user = createUser(registerDto);
-        addDefaultRole(user);
+        checkIfUserExists(newUserUsername, newUserEmail);
+        User newUser = createUser(registerDto);
+        addDefaultRole(newUser);
+        userRepo.save(newUser);
 
-        return userRepo.save(user);
+        return ResponseEntity.ok()
+                .body(RegisterResponseDto.builder()
+                        .email(newUserEmail)
+                        .username(newUserUsername)
+                        .status("OK")
+                        .build());
     }
 
     private void checkIfUserExists(String username, String email) throws UserAlreadyExistsException {
@@ -57,7 +66,7 @@ public class  AuthService {
         return User.builder()
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
-                .password(encoder.encode(registerDto.getPassword()))
+                .masterHash(registerDto.getMasterHash()) //encoder.encode()
                 .build();
     }
 

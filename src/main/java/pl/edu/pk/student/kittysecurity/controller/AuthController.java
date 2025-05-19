@@ -3,10 +3,7 @@ package pl.edu.pk.student.kittysecurity.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
-import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RefreshTokenRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.*;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
 
@@ -23,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody @Valid RegisterRequestDto request) {
+    public ResponseEntity<RegisterResponseDto> register(@RequestBody @Valid RegisterRequestDto request) {
         return authService.register(request);
     }
 

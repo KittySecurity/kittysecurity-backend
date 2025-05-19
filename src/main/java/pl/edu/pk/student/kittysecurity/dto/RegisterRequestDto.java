@@ -1,5 +1,6 @@
 package pl.edu.pk.student.kittysecurity.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -18,8 +19,8 @@ public class RegisterRequestDto {
     @Size(min = 4, message = "Username should be at least 4 characters long")
     private String username;
 
-    @NotBlank(message = "Password cannot be blank")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-            message = "Password must be at least 8 characters and include a digit, a lowercase and an uppercase letter")
-    private String password;
+    @NotBlank(message = "MasterHash cannot be blank")
+    @JsonProperty("master_hash")
+    private String masterHash;
+
 }

@@ -19,10 +19,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.edu.pk.student.kittysecurity.controller.AuthController;
-import pl.edu.pk.student.kittysecurity.dto.JwtResponseDto;
-import pl.edu.pk.student.kittysecurity.dto.LoginRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RefreshTokenRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.RegisterRequestDto;
+import pl.edu.pk.student.kittysecurity.dto.*;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
 
@@ -59,11 +56,17 @@ public class AuthControllerTests {
 
         RegisterRequestDto request = RegisterRequestDto.builder()
                                                         .email("exampleuser@examplemail.com")
-                                                        .password("Password123")
+                                                        .masterHash("Password123")
                                                         .username("exampleusername")
                                                         .build();
 
-        Mockito.when(authService.register(Mockito.any(RegisterRequestDto.class))).thenReturn(USER_1);
+        RegisterResponseDto response = RegisterResponseDto.builder()
+                                                        .email("exampleuser@examplemail.com")
+                                                        .username("exampleusername")
+                                                        .status("OK")
+                                                        .build();
+
+        Mockito.when(authService.register(Mockito.any(RegisterRequestDto.class))).thenReturn(ResponseEntity.ok().body(response));
 
         String content = objectWriter.writeValueAsString(request);
 
@@ -77,7 +80,7 @@ public class AuthControllerTests {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$.username", is("exampleusername")))
                 .andExpect(jsonPath("$.email", is("exampleuser@examplemail.com")))
-                .andExpect(jsonPath("$.password", is("Password123")));
+                .andExpect(jsonPath("$.status", is("OK")));
     }
 
     @Test

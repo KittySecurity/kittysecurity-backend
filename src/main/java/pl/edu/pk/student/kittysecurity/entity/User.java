@@ -35,7 +35,7 @@ public class User implements UserDetails {
     private String username;
 
     @Column(nullable = false)
-    private String password;
+    private String masterHash;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -52,11 +52,11 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    public User(Integer id, String email, String username, String password) {
+    public User(Integer id, String email, String username, String masterHash) {
         this.id = id;
         this.email = email;
         this.username = username;
-        this.password = password;
+        this.masterHash = masterHash;
     }
 
     @JsonIgnore
@@ -88,5 +88,10 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRole())).toList();
+    }
+
+    @Override
+    public String getPassword() {
+        return masterHash;
     }
 }
