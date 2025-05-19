@@ -30,7 +30,6 @@ public class  AuthService {
                        BCryptPasswordEncoder bCryptPasswordEncoder, JwtService jwt,
                        RefreshTokenService refreshTokenService) {
         this.userRepo = userRepo;
-        this.encoder = bCryptPasswordEncoder;
         this.authManager = authManager;
         this.jwtService = jwt;
         this.refreshTokenService = refreshTokenService;

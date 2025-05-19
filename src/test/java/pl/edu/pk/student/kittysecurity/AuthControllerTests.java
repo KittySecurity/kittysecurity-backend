@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.edu.pk.student.kittysecurity.controller.AuthController;
 import pl.edu.pk.student.kittysecurity.dto.*;
-import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.services.AuthService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
