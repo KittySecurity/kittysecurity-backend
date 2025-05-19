@@ -84,14 +84,16 @@ public class AuthControllerTests {
     public void shouldReturnJwtResponseWhenLoginWithValidCredentials() throws Exception {
 
         JwtResponseDto response = JwtResponseDto.builder()
+                .accessTokenExpiresIn(10000)
                 .accessToken("12345")
                 .accessTokenType("Bearer")
                 .refreshToken("54321")
+                .refreshTokenExpiresIn(10000000)
                 .build();
 
         LoginRequestDto request = LoginRequestDto.builder()
-                .username("testuser")
-                .password("testpassword")
+                .email("testuser")
+                .masterHash("testpassword")
                 .build();
 
         Mockito.when(authService.verify(Mockito.any(LoginRequestDto.class))).thenReturn(ResponseEntity.ok().body(response));
@@ -106,9 +108,11 @@ public class AuthControllerTests {
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.accessToken", is("12345")))
-                .andExpect(jsonPath("$.accessTokenType", is("Bearer")))
-                .andExpect(jsonPath("$.refreshToken", is("54321")));
+                .andExpect(jsonPath("$.access_token", is("12345")))
+                .andExpect(jsonPath("$.access_token_type", is("Bearer")))
+                .andExpect(jsonPath("$.refresh_token", is("54321")))
+                .andExpect(jsonPath("$.refresh_token_expires_in", is(10000000)))
+                .andExpect(jsonPath("$.access_token_expires_in", is(10000)));
     }
 
     @Test
@@ -136,8 +140,10 @@ public class AuthControllerTests {
 
         JwtResponseDto response = JwtResponseDto.builder()
                 .accessToken("new-access-token")
+                .accessTokenExpiresIn(10000)
                 .accessTokenType("Bearer")
                 .refreshToken("new-refresh-token")
+                .refreshTokenExpiresIn(10000000)
                 .build();
 
         Mockito.when(authService.refreshToken(Mockito.anyString()))
@@ -150,8 +156,10 @@ public class AuthControllerTests {
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken", is("new-access-token")))
-                .andExpect(jsonPath("$.accessTokenType", is("Bearer")))
-                .andExpect(jsonPath("$.refreshToken", is("new-refresh-token")));
+                .andExpect(jsonPath("$.access_token", is("new-access-token")))
+                .andExpect(jsonPath("$.access_token_type", is("Bearer")))
+                .andExpect(jsonPath("$.refresh_token", is("new-refresh-token")))
+                .andExpect(jsonPath("$.refresh_token_expires_in", is(10000000)))
+                .andExpect(jsonPath("$.access_token_expires_in", is(10000)));
     }
 }

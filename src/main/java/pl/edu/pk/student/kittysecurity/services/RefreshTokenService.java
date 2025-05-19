@@ -30,9 +30,9 @@ public class RefreshTokenService {
         this.encoder = encoder;
     }
 
-    public RefreshToken createRefreshToken(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public RefreshToken createRefreshToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
         RefreshToken refreshToken = buildToken(user);
         refreshTokenRepository.save(refreshToken);

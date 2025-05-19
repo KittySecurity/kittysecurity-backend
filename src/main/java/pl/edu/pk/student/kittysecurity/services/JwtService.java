@@ -21,7 +21,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final long JWT_TOKEN_VALIDITY_MS = 900_000; // 15 minutes
+    private static final Integer JWT_TOKEN_VALIDITY_MS = 900_000; // 15 minutes
     private final String secretKey;
 
     public JwtService() {
@@ -77,7 +77,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 }

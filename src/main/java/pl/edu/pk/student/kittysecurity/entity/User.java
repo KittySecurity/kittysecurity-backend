@@ -17,9 +17,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "Users")
+@Builder
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -52,13 +52,6 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    public User(Integer id, String email, String username, String masterHash) {
-        this.id = id;
-        this.email = email;
-        this.username = username;
-        this.masterHash = masterHash;
-    }
-
     @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
@@ -90,8 +83,14 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getRole())).toList();
     }
 
+    //USERDETAILS
     @Override
     public String getPassword() {
         return masterHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }
