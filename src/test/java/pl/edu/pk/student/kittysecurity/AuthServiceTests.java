@@ -75,8 +75,6 @@ public class AuthServiceTests {
 
         Mockito.when(authManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class))).thenThrow(new BadCredentialsException("Bad credentials"));
 
-        assertThrows(AuthenticationException.class, () -> {
-            authService.verify(request);
-        });
+        assertThrows(AuthenticationException.class, () -> authService.verify(request));
     }
 }

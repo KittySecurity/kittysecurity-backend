@@ -1,6 +1,5 @@
 package pl.edu.pk.student.kittysecurity.dto.other;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter

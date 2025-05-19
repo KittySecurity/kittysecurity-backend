@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pk.student.kittysecurity.dto.auth.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.user.DeleteUserRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserResponseDto;

@@ -12,7 +12,6 @@ import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
