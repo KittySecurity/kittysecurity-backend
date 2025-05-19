@@ -1,6 +1,5 @@
 package pl.edu.pk.student.kittysecurity.services;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -33,12 +32,12 @@ public class JwtService {
         }
     }
 
-    public String generateToken(String email) {
+    public String generateToken(Integer userId) {
         Map<String, Object> claims = new HashMap<>();
         Instant now = Instant.now();
         return Jwts.builder()
                 .addClaims(claims)
-                .setSubject(email)
+                .setSubject(String.valueOf(userId))
                 .setHeaderParam("typ", "JWT")
                 .setExpiration(Date.from(now.plusMillis(JWT_TOKEN_VALIDITY_MS)))
                 .setIssuedAt(Date.from(now))
@@ -51,7 +50,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractEmail(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -69,8 +68,8 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String userId = extractUserId(token);
+        return (userId.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

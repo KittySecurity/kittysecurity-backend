@@ -41,6 +41,7 @@ public class AuthServiceTests {
 
     @Test
     public void loginUserSuccess() {
+        Integer userId = 500;
         String username = "testUser";
         String password = "testPass";
         String jwtToken = "mocked-jwt-token";
@@ -50,7 +51,7 @@ public class AuthServiceTests {
 
         Mockito.when(authManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class))).thenReturn(Mockito.mock(Authentication.class));
 
-        Mockito.when(jwtService.generateToken(username)).thenReturn(jwtToken);
+        Mockito.when(jwtService.generateToken(userId)).thenReturn(jwtToken);
 
         RefreshToken mockRefreshToken = new RefreshToken();
         mockRefreshToken.setRawToken("mocked-refresh-token");
