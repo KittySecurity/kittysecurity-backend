@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import pl.edu.pk.student.kittysecurity.entity.User;
 
 import javax.crypto.KeyGenerator;
 import java.security.Key;
@@ -69,7 +70,12 @@ public class JwtService {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String userId = extractUserId(token);
-        return (userId.equals(userDetails.getUsername()) && !isTokenExpired(token));
+
+        if (userDetails instanceof User user) {
+            return (userId.equals(String.valueOf(user.getId())) && !isTokenExpired(token));
+        }
+
+        return false;
     }
 
     private boolean isTokenExpired(String token) {
