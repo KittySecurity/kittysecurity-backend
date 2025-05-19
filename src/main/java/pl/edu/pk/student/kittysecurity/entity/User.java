@@ -52,13 +52,6 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    public User(Integer id, String email, String username, String masterHash) {
-        this.id = id;
-        this.email = email;
-        this.username = username;
-        this.masterHash = masterHash;
-    }
-
     @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
