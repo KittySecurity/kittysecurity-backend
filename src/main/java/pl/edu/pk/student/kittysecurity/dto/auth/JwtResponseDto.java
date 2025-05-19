@@ -1,4 +1,4 @@
-package pl.edu.pk.student.kittysecurity.dto;
+package pl.edu.pk.student.kittysecurity.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
