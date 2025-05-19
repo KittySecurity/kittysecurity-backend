@@ -17,9 +17,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "Users")
+@Builder
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -90,8 +90,14 @@ public class User implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getRole())).toList();
     }
 
+    //USERDETAILS
     @Override
     public String getPassword() {
         return masterHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }
