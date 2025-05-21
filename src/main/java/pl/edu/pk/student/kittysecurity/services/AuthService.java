@@ -39,7 +39,7 @@ public class  AuthService {
 
     public ResponseEntity<RegisterResponseDto> register(RegisterRequestDto registerDto) {
         String newUserEmail = registerDto.getEmail();
-        String newUserUsername = registerDto.getUsername();
+        String newUserUsername = registerDto.getDisplayName();
 
         checkIfUserExists(newUserUsername, newUserEmail);
         User newUser = createUser(registerDto);
@@ -64,7 +64,7 @@ public class  AuthService {
 
     private User createUser(RegisterRequestDto registerDto){
         return User.builder()
-                .displayName(registerDto.getUsername())
+                .displayName(registerDto.getDisplayName())
                 .email(registerDto.getEmail())
                 .masterHash(encoder.encode(registerDto.getMasterHash()))
                 .build();
