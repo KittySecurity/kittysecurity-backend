@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.user.DeleteUserRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserResponseDto;
-import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateResponseDto;
 import pl.edu.pk.student.kittysecurity.services.UserService;
 
 @RestController
@@ -24,11 +22,6 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<UserResponseDto> getUserData(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken){
         return userService.getUserDataByJwt(jwtToken);
-    }
-
-    @PutMapping("")
-    public ResponseEntity<UserUpdateResponseDto> updateUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken, @RequestBody @Valid UserUpdateRequestDto request){
-        return userService.updateUserByJwt(jwtToken, request);
     }
 
     @DeleteMapping("")

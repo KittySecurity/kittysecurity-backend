@@ -1,15 +1,11 @@
 package pl.edu.pk.student.kittysecurity.services;
 
-import io.micrometer.common.util.StringUtils;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.user.DeleteUserRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserResponseDto;
-import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateRequestDto;
-import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateResponseDto;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.exception.custom.PasswordMatchException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
@@ -51,28 +47,6 @@ public class UserService {
         if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
 
         return foundUser.get();
-    }
-
-    public ResponseEntity<UserUpdateResponseDto> updateUserByJwt(String jwtToken, @Valid UserUpdateRequestDto request) {
-        User foundUser = findUserById(Integer.parseInt(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken))));
-
-        if(!StringUtils.isBlank(request.getDisplayName()))
-            foundUser.setDisplayName(request.getDisplayName());
-
-        if(!StringUtils.isBlank(request.getEmail()))
-            foundUser.setEmail(request.getEmail());
-
-        if(!StringUtils.isBlank(request.getMasterHash()))
-            foundUser.setMasterHash(encoder.encode(request.getMasterHash()));
-
-        User updatedUser = userRepo.save(foundUser);
-
-        return ResponseEntity.ok(UserUpdateResponseDto.builder()
-                .status("OK")
-                .displayName(updatedUser.getDisplayName())
-                .email(updatedUser.getEmail())
-                .updatedAt(updatedUser.getUpdatedAt().toEpochMilli())
-                .build());
     }
 
     public ResponseEntity<StatusResponseDto> deleteUserByJwt(String jwtToken, DeleteUserRequestDto request) {
