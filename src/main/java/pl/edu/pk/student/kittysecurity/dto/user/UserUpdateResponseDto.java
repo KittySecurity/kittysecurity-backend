@@ -1,7 +1,6 @@
 package pl.edu.pk.student.kittysecurity.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
