@@ -54,7 +54,7 @@ public class AuthControllerTests {
         RegisterRequestDto request = RegisterRequestDto.builder()
                                                         .email("exampleuser@examplemail.com")
                                                         .masterHash("Password123")
-                                                        .username("exampleusername")
+                                                        .displayName("exampleusername")
                                                         .build();
 
         RegisterResponseDto response = RegisterResponseDto.builder()
