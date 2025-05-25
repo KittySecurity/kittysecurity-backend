@@ -6,17 +6,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Roles")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Roles")
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer roleId;
 
     @Column(nullable = false)
     private String role;
