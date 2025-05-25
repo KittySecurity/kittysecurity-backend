@@ -86,7 +86,7 @@ public class  AuthService {
         authManager.authenticate(new UsernamePasswordAuthenticationToken(email, masterHash));
 
 
-        String jwtToken = jwtService.generateToken(userRepo.findByEmail(email).get().getId());
+        String jwtToken = jwtService.generateToken(userRepo.findByEmail(email).get().getUserId());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
 
         return ResponseEntity.ok()
@@ -101,7 +101,7 @@ public class  AuthService {
 
     public ResponseEntity<JwtResponseDto> refreshToken(String token) {
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(token);
-        String jwtToken = jwtService.generateToken(newRefreshToken.getUser().getId());
+        String jwtToken = jwtService.generateToken(newRefreshToken.getUser().getUserId());
 
         return ResponseEntity.ok()
                 .body(JwtResponseDto.builder()

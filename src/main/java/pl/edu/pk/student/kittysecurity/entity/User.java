@@ -16,17 +16,17 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "Users")
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Users")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer userId;
 
     @Column(nullable = false, unique = true)
     private String email;

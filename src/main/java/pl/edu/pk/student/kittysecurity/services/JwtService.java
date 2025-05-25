@@ -72,7 +72,7 @@ public class JwtService {
         final String userId = extractUserId(token);
 
         if (userDetails instanceof User user) {
-            return (userId.equals(String.valueOf(user.getId())) && !isTokenExpired(token));
+            return (userId.equals(String.valueOf(user.getUserId())) && !isTokenExpired(token));
         }
 
         return false;

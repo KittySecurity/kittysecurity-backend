@@ -9,10 +9,11 @@ import java.time.Instant;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Table(name = "RefreshTokens")
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer keyId;
 
     private String prefix;
 
@@ -29,7 +30,7 @@ public class RefreshToken {
     private Instant createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     @JsonBackReference
     private User user;
 }

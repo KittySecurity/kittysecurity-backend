@@ -37,7 +37,7 @@ public class UserService {
 
         return ResponseEntity.ok().body(UserResponseDto.builder()
                 .email(foundUser.getEmail())
-                .id(foundUser.getId())
+                .id(foundUser.getUserId())
                 .username(foundUser.getDisplayName())
                 .createdAt(foundUser.getCreatedAt().toEpochMilli())
                 .updatedAt(foundUser.getUpdatedAt().toEpochMilli())
