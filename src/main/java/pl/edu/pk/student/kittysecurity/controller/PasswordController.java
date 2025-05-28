@@ -31,4 +31,9 @@ public class PasswordController {
         return passwordService.getAllPasswordsByJwt(jwtToken);
     }
 
+    @GetMapping("password/{passwordId}")
+    public ResponseEntity<PasswordEntryDto> getPassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken, @PathVariable Long passwordId){
+        return passwordService.getPasswordByIdAndJwt(jwtToken, passwordId);
+    }
+
 }
