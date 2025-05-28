@@ -7,6 +7,7 @@ import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.PasswordEntryDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordEntry;
 import pl.edu.pk.student.kittysecurity.entity.User;
+import pl.edu.pk.student.kittysecurity.exception.custom.PasswordNotFoundException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 import pl.edu.pk.student.kittysecurity.repository.PasswordEntryRepository;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
@@ -54,7 +55,8 @@ public class PasswordService {
                 .login(entry.getLogin())
                 .encrypted(entry.getPasswordEncrypted())
                 .Iv(entry.getIv())
-                .build());
+                .build()
+        );
     }
 
     //TODO: REFACTOR THIS XD DUPLICATE IN USERRSERVICE
@@ -84,5 +86,28 @@ public class PasswordService {
                         .Iv(entry.getIv())
                         .build()
         ).collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<PasswordEntryDto> getPasswordByIdAndJwt(String jwtToken, Long entryId) {
+        String cleanedToken = JwtUtils.cleanToken(jwtToken);
+        Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
+
+        User foundUser = findUserById(userId);
+
+        Optional<PasswordEntry> entry = passwordEntryRepository.findByUserAndEntryId(foundUser, entryId);
+
+        if(entry.isEmpty()) throw new PasswordNotFoundException(entryId);
+
+        PasswordEntry foundEntry = entry.get();
+
+        return ResponseEntity.ok().body(PasswordEntryDto.builder()
+                        .entryId(foundEntry.getEntryId())
+                        .serviceName(foundEntry.getServiceName())
+                        .url(foundEntry.getUrl())
+                        .login(foundEntry.getLogin())
+                        .passwordEncrypted(foundEntry.getPasswordEncrypted())
+                        .Iv(foundEntry.getIv())
+                        .build()
+        );
     }
 }
