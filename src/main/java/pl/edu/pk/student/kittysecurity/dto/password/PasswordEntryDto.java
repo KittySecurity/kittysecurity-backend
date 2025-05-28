@@ -1,31 +1,28 @@
 package pl.edu.pk.student.kittysecurity.dto.password;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class CreatePasswordRequestDto {
+public class PasswordEntryDto {
 
-    @NotNull
-    private String url;
+    @JsonProperty("id")
+    private Long entryId;
 
-    @NotNull
-    private String login;
-
-    @NotNull
     @JsonProperty("name")
     private String serviceName;
 
-    @NotNull
-    @JsonProperty("encrypted")
-    private String password;
+    private String url;
 
-    @NotNull
+    private String login;
+
+    @JsonProperty("encrypted")
+    private String passwordEncrypted;
+
     @JsonProperty("IV")
     private String Iv;
 }
