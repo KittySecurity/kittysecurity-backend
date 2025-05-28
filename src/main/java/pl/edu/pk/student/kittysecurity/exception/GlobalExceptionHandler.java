@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.edu.pk.student.kittysecurity.dto.error.ErrorResponseDto;
+import pl.edu.pk.student.kittysecurity.exception.custom.PasswordNotFoundException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserAlreadyExistsException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 
@@ -56,6 +57,18 @@ public class GlobalExceptionHandler { // TODO: signatureexception
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponseDto.builder()
+                .timestamp(Instant.now().toEpochMilli())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build());
+    }
+
+    @ExceptionHandler(PasswordNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handlePasswordNotFoundException(PasswordNotFoundException ex, HttpServletRequest request) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponseDto.builder()
                 .timestamp(Instant.now().toEpochMilli())
