@@ -67,6 +67,7 @@ public class  AuthService {
                 .displayName(registerDto.getDisplayName())
                 .email(registerDto.getEmail())
                 .masterHash(encoder.encode(registerDto.getMasterHash()))
+                .isEnabled(false)
                 .build();
     }
 

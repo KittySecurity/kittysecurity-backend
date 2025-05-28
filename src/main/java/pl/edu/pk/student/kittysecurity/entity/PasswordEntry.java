@@ -17,31 +17,33 @@ import java.time.Instant;
 @Table(name = "password_entries")
 public class PasswordEntry {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Integer entryId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long entryId;
 
-        @ManyToOne
-        @JoinColumn(name = "user_id", nullable = false)
-        @JsonBackReference
-        private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    private User user;
 
-        @Column(nullable = false)
-        private String service_name;
+    @Column(nullable = false)
+    private String serviceName;
 
-        private String url;
+    private String url;
 
-        @Column(nullable = false)
-        private String login;
+    @Column(nullable = false)
+    private String login;
 
-        @Column(nullable = false)
-        private String passwordEncrypted;
+    @Column(nullable = false)
+    private String passwordEncrypted;
 
-        @CreationTimestamp
-        @Column(nullable = false, updatable = false)
-        private Instant createdAt;
+    @Column(nullable = false)
+    private String Iv;
 
-        @UpdateTimestamp
-        private Instant updatedAt;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
 }
-

@@ -49,6 +49,8 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<PasswordEntry> passwords;
 
+    private Boolean isEnabled;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
