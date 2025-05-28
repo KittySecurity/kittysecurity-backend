@@ -11,7 +11,6 @@ import pl.edu.pk.student.kittysecurity.dto.error.ErrorResponseDto;
 import pl.edu.pk.student.kittysecurity.exception.custom.PasswordNotFoundException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserAlreadyExistsException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
-
 import java.time.Instant;
 import java.util.stream.Collectors;
 
