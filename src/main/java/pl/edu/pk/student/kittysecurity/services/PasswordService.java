@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.password.PasswordEntryDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordEntry;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
@@ -11,7 +12,9 @@ import pl.edu.pk.student.kittysecurity.repository.PasswordEntryRepository;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PasswordService {
@@ -61,5 +64,25 @@ public class PasswordService {
         if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
 
         return foundUser.get();
+    }
+
+    public ResponseEntity<List<PasswordEntryDto>> getAllPasswordsByJwt(String jwtToken) {
+        String cleanedToken = JwtUtils.cleanToken(jwtToken);
+        Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
+
+        User foundUser = findUserById(userId);
+
+        List<PasswordEntry> entries = passwordEntryRepository.findByUser(foundUser);
+
+        return ResponseEntity.ok().body(entries.stream().map(
+                entry -> PasswordEntryDto.builder()
+                        .entryId(entry.getEntryId())
+                        .serviceName(entry.getServiceName())
+                        .url(entry.getUrl())
+                        .login(entry.getLogin())
+                        .passwordEncrypted(entry.getPasswordEncrypted())
+                        .Iv(entry.getIv())
+                        .build()
+        ).collect(Collectors.toList()));
     }
 }
