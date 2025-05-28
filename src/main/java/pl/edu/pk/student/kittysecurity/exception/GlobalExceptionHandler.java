@@ -1,6 +1,5 @@
 package pl.edu.pk.student.kittysecurity.exception;
 
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +11,6 @@ import pl.edu.pk.student.kittysecurity.dto.error.ErrorResponseDto;
 import pl.edu.pk.student.kittysecurity.exception.custom.PasswordNotFoundException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserAlreadyExistsException;
 import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
-
-import java.security.SignatureException;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
