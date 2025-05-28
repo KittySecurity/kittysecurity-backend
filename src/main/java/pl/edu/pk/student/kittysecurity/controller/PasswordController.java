@@ -6,11 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordResponseDto;
-import pl.edu.pk.student.kittysecurity.entity.User;
-import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 import pl.edu.pk.student.kittysecurity.services.PasswordService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/password")
