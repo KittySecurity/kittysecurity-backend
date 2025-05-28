@@ -1,0 +1,2 @@
+ALTER TABLE password_entries
+ADD COLUMN iv VARCHAR(255);
