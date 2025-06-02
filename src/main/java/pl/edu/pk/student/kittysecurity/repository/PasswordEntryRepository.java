@@ -12,5 +12,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, In
 
     List<PasswordEntry> findByUser(User user);
 
+    Optional<PasswordEntry> findByEntryId(Long passwordId);
+  
     Optional<PasswordEntry> findByUserAndEntryId(User user, Long entryId);
 }

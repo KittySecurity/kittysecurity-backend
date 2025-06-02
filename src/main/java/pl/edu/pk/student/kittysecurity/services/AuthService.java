@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pk.student.kittysecurity.dto.auth.JwtResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.RegisterRequestDto;
@@ -37,6 +38,7 @@ public class  AuthService {
         this.refreshTokenService = refreshTokenService;
     }
 
+    @Transactional
     public ResponseEntity<RegisterResponseDto> register(RegisterRequestDto registerDto) {
         String newUserEmail = registerDto.getEmail();
         String newUserUsername = registerDto.getDisplayName();
@@ -85,7 +87,6 @@ public class  AuthService {
         String masterHash = request.getMasterHash();
 
         authManager.authenticate(new UsernamePasswordAuthenticationToken(email, masterHash));
-
 
         String jwtToken = jwtService.generateToken(userRepo.findByEmail(email).get().getUserId());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
