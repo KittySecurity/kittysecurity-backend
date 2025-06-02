@@ -1,5 +1,6 @@
 package pl.edu.pk.student.kittysecurity.config.filter;
 
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,27 +23,29 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-    public JwtFilter(JwtService jwtService, UserRepository userRepo) {
+    public JwtFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
-        this.userRepository = userRepo;
+        this.userRepository = userRepository;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String token = null;
-        String userId;
+        String userId = null;
         String authHeader = request.getHeader("Authorization");
+
         try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 userId = jwtService.extractUserId(token);
-            } else {
-                userId = null;
             }
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String finalUserId = userId;
                 User user = userRepository.findById(Integer.valueOf(userId))
-                        .orElseThrow(() -> new UserNotFoundException(Integer.valueOf(userId)));
+                        .orElseThrow(() -> new UserNotFoundException(Integer.valueOf(finalUserId)));
 
                 if (jwtService.validateToken(token, user)) {
                     UsernamePasswordAuthenticationToken authToken =
@@ -57,6 +60,10 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"User not found\"}");
+        } catch (SignatureException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid or expired JWT token\"}");
         }
     }
 }

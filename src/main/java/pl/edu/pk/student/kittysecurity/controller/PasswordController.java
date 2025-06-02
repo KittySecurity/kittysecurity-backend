@@ -31,6 +31,11 @@ public class PasswordController {
     public ResponseEntity<List<PasswordEntryDto>> getAllPasswords(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken){
         return passwordService.getAllPasswordsByJwt(jwtToken);
     }
+  
+    @GetMapping("password/{passwordId}")
+    public ResponseEntity<PasswordEntryDto> getPassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken, @PathVariable Long passwordId){
+        return passwordService.getPasswordByIdAndJwt(jwtToken, passwordId);
+    }
 
     @DeleteMapping("password/{passwordId}")
     public ResponseEntity<StatusResponseDto> removePassword(@PathVariable Long passwordId){
