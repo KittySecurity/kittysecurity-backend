@@ -44,7 +44,7 @@ class JwtServiceTests {
         String token = jwtService.generateToken(userId);
 
         User user = new User();
-        user.setId(userId);
+        user.setUserId(userId);
 
         boolean isValid = jwtService.validateToken(token, user);
 
