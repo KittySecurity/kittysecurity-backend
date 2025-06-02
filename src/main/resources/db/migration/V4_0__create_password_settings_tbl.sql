@@ -7,5 +7,5 @@ CREATE TABLE PasswordGenSettings (
     hasUppercase BOOLEAN NOT NULL,
     hasSpecial BOOLEAN NOT NULL,
     hasDigits BOOLEAN NOT NULL,
-    CONSTRAINT fk_settings_user FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+    CONSTRAINT fk_settings_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
