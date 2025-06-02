@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.user.DeleteUserRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserResponseDto;
@@ -75,6 +76,7 @@ public class UserService {
                 .build());
     }
 
+    @Transactional
     public ResponseEntity<StatusResponseDto> deleteUserByJwt(String jwtToken, DeleteUserRequestDto request) {
         User foundUser = findUserById(Integer.parseInt(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken))));
 
