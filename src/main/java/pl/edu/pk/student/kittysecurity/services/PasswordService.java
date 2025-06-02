@@ -1,7 +1,11 @@
 package pl.edu.pk.student.kittysecurity.services;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.password.CreatePasswordResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.PasswordEntryDto;
@@ -29,6 +33,7 @@ public class PasswordService {
         this.passwordEntryRepository = passwordEntryRepository;
     }
 
+    @Transactional
     public ResponseEntity<CreatePasswordResponseDto> addPasswordByJwt(String jwtToken, CreatePasswordRequestDto request) {
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
         Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
@@ -85,4 +90,21 @@ public class PasswordService {
                         .build()
         ).collect(Collectors.toList()));
     }
+
+    @Transactional
+    public ResponseEntity<StatusResponseDto> removePasswordByIdAndJwt(Long passwordId){
+
+        Optional<PasswordEntry> foundEntry = passwordEntryRepository.findByEntryId(passwordId);
+
+        if(foundEntry.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password entry not found.");
+
+        passwordEntryRepository.delete(foundEntry.get());
+
+        return ResponseEntity.ok().body(StatusResponseDto.builder()
+                            .status("Success")
+                            .build()
+        );
+    }
+
 }

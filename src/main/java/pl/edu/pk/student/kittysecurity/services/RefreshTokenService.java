@@ -3,6 +3,7 @@ package pl.edu.pk.student.kittysecurity.services;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.repository.RefreshTokenRepository;
@@ -30,6 +31,7 @@ public class RefreshTokenService {
         this.encoder = encoder;
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
@@ -40,6 +42,7 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(User user) {
 
         RefreshToken refreshToken = buildToken(user);
@@ -64,11 +67,13 @@ public class RefreshTokenService {
         return UUID.randomUUID().toString();
     }
 
+    @Transactional
     public void findAndDelete(String token) {
         RefreshToken removeToken = findByPrefix(token);
         refreshTokenRepository.delete(removeToken);
     }
 
+    @Transactional
     public RefreshToken rotateRefreshToken(String rawToken) {
         RefreshToken oldRefreshToken = findByPrefix(rawToken);
         User tokenOwner = oldRefreshToken.getUser();

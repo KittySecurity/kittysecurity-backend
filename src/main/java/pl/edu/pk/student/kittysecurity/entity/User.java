@@ -45,7 +45,7 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<PasswordEntry> passwords;
 
