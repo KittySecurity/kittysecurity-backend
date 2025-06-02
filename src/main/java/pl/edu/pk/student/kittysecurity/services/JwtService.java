@@ -33,7 +33,7 @@ public class JwtService {
         }
     }
 
-    public String generateToken(Integer userId) {
+    public String generateToken(Long userId) {
         Map<String, Object> claims = new HashMap<>();
         Instant now = Instant.now();
         return Jwts.builder()
