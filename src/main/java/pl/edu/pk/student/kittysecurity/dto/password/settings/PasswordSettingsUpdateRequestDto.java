@@ -1,7 +1,6 @@
 package pl.edu.pk.student.kittysecurity.dto.password.settings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,15 +29,11 @@ public class PasswordSettingsUpdateRequestDto {
     private Boolean hasLowercase;
 
     @JsonProperty("uppercase")
-    @Size(message = "Username should be at least 4 characters long")
     private Boolean hasUppercase;
 
     @JsonProperty("specials")
-    @Size(message = "Username should be at least 4 characters long")
     private Boolean hasSpecial;
 
     @JsonProperty("numbers")
-    @Size(message = "Username should be at least 4 characters long")
     private Boolean hasDigits;
-
 }
