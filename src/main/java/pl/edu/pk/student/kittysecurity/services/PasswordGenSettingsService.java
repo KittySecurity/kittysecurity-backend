@@ -1,29 +1,26 @@
 package pl.edu.pk.student.kittysecurity.services;
 
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
+import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsGetResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsUpdateRequestDto;
-import pl.edu.pk.student.kittysecurity.entity.User;
-import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
+import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.repository.PasswordGenSettingsRepository;
-import pl.edu.pk.student.kittysecurity.repository.UserRepository;
 import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class PasswordGenSettingsService {
 
-    private final UserRepository userRepo;
     private final JwtService jwtService;
     private final PasswordGenSettingsRepository passwordGenSettingsRepository;
 
-    public PasswordGenSettingsService(UserRepository userRepo, JwtService jwtService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
-        this.userRepo = userRepo;
+    public PasswordGenSettingsService(JwtService jwtService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
         this.jwtService = jwtService;
         this.passwordGenSettingsRepository = passwordGenSettingsRepository;
     }
@@ -36,27 +33,77 @@ public class PasswordGenSettingsService {
         }
 
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = Long.valueOf(jwtService.extractUserId(cleanedToken));
+        Long userId = jwtService.extractUserId(cleanedToken);
 
-        User foundUser = findUserById(userId);
+        Optional<PasswordGenSettings> passwordGenSettings = passwordGenSettingsRepository.findById(userId);
 
+        if(passwordGenSettings.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password Settings not found for this user");
+
+        PasswordGenSettings foundSettings = passwordGenSettings.get();
+
+        if(request.getPasswordLength() != null)
+            foundSettings.setPasswordLength((request.getPasswordLength()));
+
+        if(request.getMinNumOfSpecChars() != null)
+            foundSettings.setMinNumOfSpecChars((request.getMinNumOfSpecChars()));
+
+        if(request.getMinNumOfDigits() != null)
+            foundSettings.setMinNumOfDigits((request.getMinNumOfDigits()));
+
+        if(request.getHasDigits() != null)
+            foundSettings.setHasDigits(request.getHasDigits());
+
+        if(request.getHasLowercase() != null)
+            foundSettings.setHasLowercase(request.getHasLowercase());
+
+        if(request.getHasSpecial() != null)
+            foundSettings.setHasSpecial(request.getHasSpecial());
+
+        if(request.getHasUppercase() != null)
+            foundSettings.setHasUppercase(request.getHasUppercase());
+
+        passwordGenSettingsRepository.save(foundSettings);
 
         return ResponseEntity.ok().body(StatusResponseDto.builder()
-                .status("Password Generation Settings Successfully Updated!")
+                .status("Success!")
                 .build());
     }
 
     private int calculatePasswordLength(PasswordGenSettingsUpdateRequestDto request){
+        int actualPasswordLength;
 
-        return 10000;
+        actualPasswordLength =
+                Objects.requireNonNullElse(request.getMinNumOfDigits(), 0)
+                        + Objects.requireNonNullElse(request.getMinNumOfSpecChars(), 0)
+                        + (Boolean.TRUE.equals(request.getHasDigits()) ? 1 : 0)
+                        + (Boolean.TRUE.equals(request.getHasLowercase()) ? 1 : 0)
+                        + (Boolean.TRUE.equals(request.getHasSpecial()) ? 1 : 0)
+                        + (Boolean.TRUE.equals(request.getHasUppercase()) ? 1 : 0);
+
+        return actualPasswordLength;
     }
 
-    //TODO: REFACTOR THIS XD DUPLICATE IN USERRSERVICE
-    private User findUserById(Long userId){
-        Optional<User> foundUser = userRepo.findById(userId);
+    public ResponseEntity<PasswordGenSettingsGetResponseDto> getPasswordGenSettings(String jwtToken) {
+        String cleanedToken = JwtUtils.cleanToken(jwtToken);
+        Long userId = jwtService.extractUserId(cleanedToken);
 
-        if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
+        Optional<PasswordGenSettings> foundSettings = passwordGenSettingsRepository.findById(userId);
 
-        return foundUser.get();
+        if(foundSettings.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password Settings not found for this user");
+
+        PasswordGenSettings passwordSettings = foundSettings.get();
+
+        return ResponseEntity.ok().body(PasswordGenSettingsGetResponseDto.builder()
+                        .hasDigits(passwordSettings.getHasDigits())
+                        .hasLowercase(passwordSettings.getHasLowercase())
+                        .hasSpecial(passwordSettings.getHasSpecial())
+                        .hasUppercase(passwordSettings.getHasUppercase())
+                        .minNumOfDigits(passwordSettings.getMinNumOfDigits())
+                        .minNumOfSpecChars(passwordSettings.getMinNumOfSpecChars())
+                        .passwordLength(passwordSettings.getPasswordLength())
+                        .build()
+        );
     }
 }
