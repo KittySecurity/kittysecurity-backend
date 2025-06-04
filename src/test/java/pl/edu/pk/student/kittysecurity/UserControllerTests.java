@@ -58,7 +58,7 @@ public class UserControllerTests {
         String token = "Bearer valid.jwt.token";
 
         UserResponseDto userResponse = UserResponseDto.builder()
-                .id(1)
+                .id(1L)
                 .username("exampleusername")
                 .email("exampleuser@examplemail.com")
                 .createdAt(1625247600000L)
