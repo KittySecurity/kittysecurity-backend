@@ -34,7 +34,7 @@ public class UserService {
 
     public ResponseEntity<UserResponseDto> getUserDataByJwt(String jwtToken) {
 
-        User foundUser = findUserById(Integer.parseInt(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken))));
+        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
 
         return ResponseEntity.ok().body(UserResponseDto.builder()
                 .email(foundUser.getEmail())
@@ -46,7 +46,7 @@ public class UserService {
         );
     }
 
-    private User findUserById(Integer userId){
+    private User findUserById(Long userId){
         Optional<User> foundUser = userRepo.findById(userId);
 
         if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
@@ -55,7 +55,7 @@ public class UserService {
     }
 
     public ResponseEntity<UserUpdateResponseDto> updateUserByJwt(String jwtToken, @Valid UserUpdateRequestDto request) {
-        User foundUser = findUserById(Integer.parseInt(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken))));
+        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
 
         if(!StringUtils.isBlank(request.getDisplayName()))
             foundUser.setDisplayName(request.getDisplayName());
@@ -78,7 +78,7 @@ public class UserService {
 
     @Transactional
     public ResponseEntity<StatusResponseDto> deleteUserByJwt(String jwtToken, DeleteUserRequestDto request) {
-        User foundUser = findUserById(Integer.parseInt(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken))));
+        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
 
         if(encoder.matches(request.getMasterHash(), foundUser.getMasterHash())) userRepo.delete(foundUser);
         else throw new PasswordMatchException("Passwords do not match!");

@@ -33,9 +33,9 @@ class JwtServiceTests {
         Long userId = 456L;
         String token = jwtService.generateToken(userId);
 
-        String extractedUserId = jwtService.extractUserId(token);
+        Long extractedUserId = jwtService.extractUserId(token);
 
-        assertEquals(String.valueOf(userId), extractedUserId);
+        assertEquals(userId, extractedUserId);
     }
 
     @Test

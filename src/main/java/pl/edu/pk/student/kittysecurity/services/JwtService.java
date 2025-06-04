@@ -46,8 +46,8 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public Long extractUserId(String token) {
+        return Long.valueOf(extractClaim(token, Claims::getSubject));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -64,10 +64,10 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String userId = extractUserId(token);
+        final Long userId = extractUserId(token);
 
         if (userDetails instanceof User user) {
-            return (userId.equals(String.valueOf(user.getUserId())) && !isTokenExpired(token));
+            return (userId.equals(user.getUserId()) && !isTokenExpired(token));
         }
 
         return false;
