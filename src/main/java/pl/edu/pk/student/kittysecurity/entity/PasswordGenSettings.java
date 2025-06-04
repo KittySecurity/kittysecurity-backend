@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Table(name = "password_gen_settings")
-public class PasswordGenerationSettings {
+public class PasswordGenSettings {
 
     @Id
     @Column(name = "user_id")
