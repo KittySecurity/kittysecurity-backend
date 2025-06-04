@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class PasswordSettingsUpdateRequestDto {
+public class PasswordGenSettingsUpdateRequestDto {
     @JsonProperty("length")
     @Size(min = 8, message = "Generated password should be at least 8 characters long")
     @Size(max = 128, message = "Generated password should be not longer than 128 characters")

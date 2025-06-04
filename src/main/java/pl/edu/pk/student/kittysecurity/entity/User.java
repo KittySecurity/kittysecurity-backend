@@ -51,7 +51,7 @@ public class User implements UserDetails {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
-    private PasswordGenerationSettings settings;
+    private PasswordGenSettings settings;
 
     private Boolean isEnabled;
 

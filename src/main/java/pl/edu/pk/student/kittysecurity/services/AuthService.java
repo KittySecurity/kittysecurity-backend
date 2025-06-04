@@ -11,7 +11,7 @@ import pl.edu.pk.student.kittysecurity.dto.auth.JwtResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.RegisterRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.RegisterResponseDto;
-import pl.edu.pk.student.kittysecurity.entity.PasswordGenerationSettings;
+import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.Role;
 import pl.edu.pk.student.kittysecurity.entity.User;
@@ -76,15 +76,15 @@ public class  AuthService {
                 .isEnabled(false)
                 .build();
 
-        PasswordGenerationSettings settings = createDefaultPasswordGenSettings(createdUser);
+        PasswordGenSettings settings = createDefaultPasswordGenSettings(createdUser);
 
         createdUser.setSettings(settings);
 
         return createdUser;
     }
 
-    private PasswordGenerationSettings createDefaultPasswordGenSettings(User user){
-        return PasswordGenerationSettings.builder()
+    private PasswordGenSettings createDefaultPasswordGenSettings(User user){
+        return PasswordGenSettings.builder()
                 .user(user)
                 .minNumOfDigits(passwordGenerationDefaults.getMinNumOfDigits())
                 .minNumOfSpecChars(passwordGenerationDefaults.getMinNumOfSpecChars())
