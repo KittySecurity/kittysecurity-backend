@@ -37,6 +37,18 @@ public class PasswordGenSettingsService {
 
         Optional<PasswordGenSettings> passwordGenSettings = passwordGenSettingsRepository.findById(userId);
 
+
+
+        PasswordGenSettings foundSettings = getPasswordGenSettings(request, passwordGenSettings);
+
+        passwordGenSettingsRepository.save(foundSettings);
+
+        return ResponseEntity.ok().body(StatusResponseDto.builder()
+                .status("Success!")
+                .build());
+    }
+
+    private PasswordGenSettings getPasswordGenSettings(PasswordGenSettingsUpdateRequestDto request, Optional<PasswordGenSettings> passwordGenSettings) {
         if(passwordGenSettings.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password Settings not found for this user");
 
@@ -62,12 +74,7 @@ public class PasswordGenSettingsService {
 
         if(request.getHasUppercase() != null)
             foundSettings.setHasUppercase(request.getHasUppercase());
-
-        passwordGenSettingsRepository.save(foundSettings);
-
-        return ResponseEntity.ok().body(StatusResponseDto.builder()
-                .status("Success!")
-                .build());
+        return foundSettings;
     }
 
     private int calculatePasswordLength(PasswordGenSettingsUpdateRequestDto request){
