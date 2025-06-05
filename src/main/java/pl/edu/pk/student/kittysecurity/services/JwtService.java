@@ -4,15 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pl.edu.pk.student.kittysecurity.entity.User;
 
-import javax.crypto.KeyGenerator;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,26 +19,23 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final Integer JWT_TOKEN_VALIDITY_MS = 900_000; // 15 minutes
     private final String secretKey;
+    private final Integer jwtTokenValidityMs;
 
-    public JwtService() {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-            secretKey = Base64.getEncoder().encodeToString((keyGen.generateKey()).getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+
+    public JwtService(@Value("${jwt.secretKey}") String secretKey, @Value("${jwt.token-validity-ms}") Integer jwtTokenValidityMs) {
+        this.secretKey = secretKey;
+        this.jwtTokenValidityMs = jwtTokenValidityMs;
     }
 
-    public String generateToken(Integer userId) {
+    public String generateToken(Long userId) {
         Map<String, Object> claims = new HashMap<>();
         Instant now = Instant.now();
         return Jwts.builder()
                 .addClaims(claims)
                 .setSubject(String.valueOf(userId))
                 .setHeaderParam("typ", "JWT")
-                .setExpiration(Date.from(now.plusMillis(JWT_TOKEN_VALIDITY_MS)))
+                .setExpiration(Date.from(now.plusMillis(jwtTokenValidityMs)))
                 .setIssuedAt(Date.from(now))
                 .signWith(getKey())
                 .compact();
@@ -51,8 +46,8 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public Long extractUserId(String token) {
+        return Long.valueOf(extractClaim(token, Claims::getSubject));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -69,10 +64,10 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String userId = extractUserId(token);
+        final Long userId = extractUserId(token);
 
         if (userDetails instanceof User user) {
-            return (userId.equals(String.valueOf(user.getUserId())) && !isTokenExpired(token));
+            return (userId.equals(user.getUserId()) && !isTokenExpired(token));
         }
 
         return false;

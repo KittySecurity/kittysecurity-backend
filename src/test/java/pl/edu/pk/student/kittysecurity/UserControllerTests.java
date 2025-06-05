@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.edu.pk.student.kittysecurity.controller.UserController;
-import pl.edu.pk.student.kittysecurity.dto.auth.*;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.user.DeleteUserRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserResponseDto;
@@ -58,7 +57,7 @@ public class UserControllerTests {
         String token = "Bearer valid.jwt.token";
 
         UserResponseDto userResponse = UserResponseDto.builder()
-                .id(1)
+                .id(1L)
                 .username("exampleusername")
                 .email("exampleuser@examplemail.com")
                 .createdAt(1625247600000L)

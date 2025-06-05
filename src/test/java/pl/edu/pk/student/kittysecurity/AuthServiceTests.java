@@ -41,7 +41,7 @@ public class AuthServiceTests {
 
     @Test
     public void loginUserSuccess() {
-        Integer userId = 500;
+        Long userId = 500L;
         String username = "testUser";
         String password = "testPass";
         String jwtToken = "mocked-jwt-token";

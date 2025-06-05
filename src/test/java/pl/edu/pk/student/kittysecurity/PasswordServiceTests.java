@@ -43,7 +43,7 @@ class PasswordServiceTests {
 
     private static final String JWT_TOKEN = "Bearer token";
     private static final String CLEANED_TOKEN = "token";
-    private static final Integer USER_ID = 42;
+    private static final Long USER_ID = 42L;
 
     private User sampleUser() {
         User user = new User();
@@ -73,7 +73,7 @@ class PasswordServiceTests {
                 .Iv("iv")
                 .build();
 
-        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID.toString());
+        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.of(sampleUser()));
         when(passwordEntryRepository.save(any(PasswordEntry.class))).thenAnswer(i -> i.getArguments()[0]);
         try (var mockedStatic = Mockito.mockStatic(JwtUtils.class)) {
@@ -92,7 +92,7 @@ class PasswordServiceTests {
 
     @Test
     void addPasswordByJwt_userNotFound_shouldThrow() {
-        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID.toString());
+        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.empty());
         try (var mockedStatic = Mockito.mockStatic(JwtUtils.class)) {
             mockedStatic.when(() -> JwtUtils.cleanToken(JWT_TOKEN)).thenReturn(CLEANED_TOKEN);
@@ -106,7 +106,7 @@ class PasswordServiceTests {
         User user = sampleUser();
         PasswordEntry entry = sampleEntry(user);
 
-        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID.toString());
+        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.of(user));
         when(passwordEntryRepository.findByUser(user)).thenReturn(List.of(entry));
         try (var mockedStatic = Mockito.mockStatic(JwtUtils.class)) {
@@ -130,7 +130,7 @@ class PasswordServiceTests {
         User user = sampleUser();
         PasswordEntry entry = sampleEntry(user);
 
-        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID.toString());
+        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.of(user));
         when(passwordEntryRepository.findByUserAndEntryId(user, entry.getEntryId())).thenReturn(Optional.of(entry));
         try (var mockedStatic = Mockito.mockStatic(JwtUtils.class)) {
@@ -147,7 +147,7 @@ class PasswordServiceTests {
     void getPasswordByIdAndJwt_passwordNotFound_shouldThrow() {
         User user = sampleUser();
 
-        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID.toString());
+        when(jwtService.extractUserId(CLEANED_TOKEN)).thenReturn(USER_ID);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.of(user));
         when(passwordEntryRepository.findByUserAndEntryId(user, 999L)).thenReturn(Optional.empty());
         try (var mockedStatic = Mockito.mockStatic(JwtUtils.class)) {

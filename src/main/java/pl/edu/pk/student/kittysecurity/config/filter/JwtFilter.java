@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = null;
-        String userId = null;
+        Long userId = null;
         String authHeader = request.getHeader("Authorization");
 
         try {
@@ -43,9 +43,9 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                String finalUserId = userId;
-                User user = userRepository.findById(Integer.valueOf(userId))
-                        .orElseThrow(() -> new UserNotFoundException(Integer.valueOf(finalUserId)));
+                Long finalUserId = userId;
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(finalUserId));
 
                 if (jwtService.validateToken(token, user)) {
                     UsernamePasswordAuthenticationToken authToken =
