@@ -15,6 +15,7 @@ import pl.edu.pk.student.kittysecurity.repository.PasswordGenSettingsRepository;
 import pl.edu.pk.student.kittysecurity.services.AuthContextService;
 import pl.edu.pk.student.kittysecurity.services.PasswordGenSettingsService;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +56,7 @@ public class PasswordGenSettingsServiceTests {
         ResponseEntity<StatusResponseDto> response = service.updatePasswordGenSettingsEntity(mockToken, request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Success!", response.getBody().getStatus());
+        assertEquals("Success!", Objects.requireNonNull(response.getBody()).getStatus());
 
         verify(passwordGenSettingsRepository).save(existingSettings);
     }

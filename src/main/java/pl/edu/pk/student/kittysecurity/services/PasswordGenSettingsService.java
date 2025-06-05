@@ -9,7 +9,6 @@ import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettings
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsUpdateRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.repository.PasswordGenSettingsRepository;
-import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
 import java.util.Objects;
 import java.util.Optional;

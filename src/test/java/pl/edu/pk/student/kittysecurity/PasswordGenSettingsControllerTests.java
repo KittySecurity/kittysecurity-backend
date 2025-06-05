@@ -6,12 +6,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import pl.edu.pk.student.kittysecurity.controller.PasswordGenSettingsController;
 import pl.edu.pk.student.kittysecurity.dto.other.StatusResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsGetResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsUpdateRequestDto;
 import pl.edu.pk.student.kittysecurity.services.PasswordGenSettingsService;
+
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -45,8 +48,8 @@ public class PasswordGenSettingsControllerTests {
 
         ResponseEntity<PasswordGenSettingsGetResponseDto> response = controller.getPasswordGenSettings(mockJwtToken);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(mockResponseDto.getPasswordLength(), response.getBody().getPasswordLength());
+        assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+        assertEquals(mockResponseDto.getPasswordLength(), Objects.requireNonNull(response.getBody()).getPasswordLength());
         assertEquals(mockResponseDto.getMinNumOfDigits(), response.getBody().getMinNumOfDigits());
         assertEquals(mockResponseDto.getMinNumOfSpecChars(), response.getBody().getMinNumOfSpecChars());
         assertEquals(mockResponseDto.getHasLowercase(), response.getBody().getHasLowercase());
@@ -77,7 +80,7 @@ public class PasswordGenSettingsControllerTests {
 
         ResponseEntity<StatusResponseDto> response = controller.updatePasswordGenSettings(mockJwtToken, mockRequest);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Success!", response.getBody().getStatus());
+        assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+        assertEquals("Success!", Objects.requireNonNull(response.getBody()).getStatus());
     }
 }

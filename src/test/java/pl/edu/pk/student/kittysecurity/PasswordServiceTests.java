@@ -15,6 +15,7 @@ import pl.edu.pk.student.kittysecurity.services.AuthContextService;
 import pl.edu.pk.student.kittysecurity.services.PasswordService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,7 +74,7 @@ class PasswordServiceTests {
 
         ResponseEntity<CreatePasswordResponseDto> response = passwordService.addPasswordByJwt(JWT_TOKEN, request);
 
-        assertEquals("success", response.getBody().getStatus());
+        assertEquals("success", Objects.requireNonNull(response.getBody()).getStatus());
         assertEquals("service", response.getBody().getServiceName());
         assertEquals("http://example.com", response.getBody().getUrl());
         assertEquals("login", response.getBody().getLogin());
@@ -91,8 +92,8 @@ class PasswordServiceTests {
 
         ResponseEntity<List<PasswordEntryDto>> response = passwordService.getAllPasswordsByJwt(JWT_TOKEN);
 
-        assertEquals(1, response.getBody().size());
-        PasswordEntryDto dto = response.getBody().get(0);
+        assertEquals(1, Objects.requireNonNull(response.getBody()).size());
+        PasswordEntryDto dto = response.getBody().getFirst();
         assertEquals(entry.getEntryId(), dto.getEntryId());
         assertEquals(entry.getServiceName(), dto.getServiceName());
         assertEquals(entry.getUrl(), dto.getUrl());
@@ -111,7 +112,7 @@ class PasswordServiceTests {
 
         ResponseEntity<PasswordEntryDto> response = passwordService.getPasswordByIdAndJwt(JWT_TOKEN, entry.getEntryId());
 
-        assertEquals(entry.getEntryId(), response.getBody().getEntryId());
+        assertEquals(entry.getEntryId(), Objects.requireNonNull(response.getBody()).getEntryId());
         assertEquals(entry.getServiceName(), response.getBody().getServiceName());
     }
 
