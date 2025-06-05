@@ -37,7 +37,7 @@ public class PasswordService {
     @Transactional
     public ResponseEntity<CreatePasswordResponseDto> addPasswordByJwt(String jwtToken, CreatePasswordRequestDto request) {
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
+        Long userId = jwtService.extractUserId(cleanedToken);
 
         User foundUser = findUserById(userId);
 
@@ -65,7 +65,7 @@ public class PasswordService {
     }
 
     //TODO: REFACTOR THIS XD DUPLICATE IN USERRSERVICE
-    private User findUserById(Integer userId){
+    private User findUserById(Long userId){
         Optional<User> foundUser = userRepo.findById(userId);
 
         if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
@@ -75,7 +75,7 @@ public class PasswordService {
 
     public ResponseEntity<List<PasswordEntryDto>> getAllPasswordsByJwt(String jwtToken) {
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
+        Long userId = jwtService.extractUserId(cleanedToken);
 
         User foundUser = findUserById(userId);
 
@@ -111,7 +111,7 @@ public class PasswordService {
 
     public ResponseEntity<PasswordEntryDto> getPasswordByIdAndJwt(String jwtToken, Long entryId) {
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Integer userId = Integer.parseInt(jwtService.extractUserId(cleanedToken));
+        Long userId = jwtService.extractUserId(cleanedToken);
 
         User foundUser = findUserById(userId);
 

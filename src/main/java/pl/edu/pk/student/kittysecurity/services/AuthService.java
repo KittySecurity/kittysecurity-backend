@@ -6,10 +6,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.pk.student.kittysecurity.config.PasswordGenerationDefaults;
 import pl.edu.pk.student.kittysecurity.dto.auth.JwtResponseDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.LoginRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.RegisterRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.auth.RegisterResponseDto;
+import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.entity.RefreshToken;
 import pl.edu.pk.student.kittysecurity.entity.Role;
 import pl.edu.pk.student.kittysecurity.entity.User;
@@ -27,15 +29,17 @@ public class  AuthService {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordGenerationDefaults passwordGenerationDefaults;
 
     public AuthService(UserRepository userRepo, AuthenticationManager authManager,
                        BCryptPasswordEncoder bCryptPasswordEncoder, JwtService jwt,
-                       RefreshTokenService refreshTokenService) {
+                       RefreshTokenService refreshTokenService, PasswordGenerationDefaults defaults) {
         this.userRepo = userRepo;
         this.encoder = bCryptPasswordEncoder;
         this.authManager = authManager;
         this.jwtService = jwt;
         this.refreshTokenService = refreshTokenService;
+        this.passwordGenerationDefaults = defaults;
     }
 
     @Transactional
@@ -65,11 +69,30 @@ public class  AuthService {
     }
 
     private User createUser(RegisterRequestDto registerDto){
-        return User.builder()
+        User createdUser = User.builder()
                 .displayName(registerDto.getDisplayName())
                 .email(registerDto.getEmail())
                 .masterHash(encoder.encode(registerDto.getMasterHash()))
                 .isEnabled(false)
+                .build();
+
+        PasswordGenSettings settings = createDefaultPasswordGenSettings(createdUser);
+
+        createdUser.setSettings(settings);
+
+        return createdUser;
+    }
+
+    private PasswordGenSettings createDefaultPasswordGenSettings(User user){
+        return PasswordGenSettings.builder()
+                .user(user)
+                .minNumOfDigits(passwordGenerationDefaults.getMinNumOfDigits())
+                .minNumOfSpecChars(passwordGenerationDefaults.getMinNumOfSpecChars())
+                .passwordLength(passwordGenerationDefaults.getLength())
+                .hasUppercase(passwordGenerationDefaults.isIncludeUppercase())
+                .hasLowercase(passwordGenerationDefaults.isIncludeLowercase())
+                .hasDigits(passwordGenerationDefaults.isIncludeDigits())
+                .hasSpecial(passwordGenerationDefaults.isIncludeSpecials())
                 .build();
     }
 
