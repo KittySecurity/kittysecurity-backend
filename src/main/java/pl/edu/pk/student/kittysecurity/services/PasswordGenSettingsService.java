@@ -9,7 +9,6 @@ import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettings
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsUpdateRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.repository.PasswordGenSettingsRepository;
-import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -17,29 +16,26 @@ import java.util.Optional;
 @Service
 public class PasswordGenSettingsService {
 
-    private final JwtService jwtService;
+    private final AuthContextService authContextService;
     private final PasswordGenSettingsRepository passwordGenSettingsRepository;
 
-    public PasswordGenSettingsService(JwtService jwtService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
-        this.jwtService = jwtService;
+    public PasswordGenSettingsService(AuthContextService authContextService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
+        this.authContextService = authContextService;
         this.passwordGenSettingsRepository = passwordGenSettingsRepository;
     }
 
-    public ResponseEntity<StatusResponseDto> updatePasswordGenSettings(String jwtToken, PasswordGenSettingsUpdateRequestDto request) {
+    public ResponseEntity<StatusResponseDto> updatePasswordGenSettingsEntity(String jwtToken, PasswordGenSettingsUpdateRequestDto request) {
         int calculatedPasswordLength = calculatePasswordLength(request);
 
         if(calculatedPasswordLength > request.getPasswordLength()){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Given configuration exceeds password length!");
         }
 
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
+        Long userId = authContextService.extractUserIdFromToken(jwtToken);
 
         Optional<PasswordGenSettings> passwordGenSettings = passwordGenSettingsRepository.findById(userId);
 
-
-
-        PasswordGenSettings foundSettings = getPasswordGenSettings(request, passwordGenSettings);
+        PasswordGenSettings foundSettings = updatePasswordGenSettingsEntity(request, passwordGenSettings);
 
         passwordGenSettingsRepository.save(foundSettings);
 
@@ -48,7 +44,7 @@ public class PasswordGenSettingsService {
                 .build());
     }
 
-    private PasswordGenSettings getPasswordGenSettings(PasswordGenSettingsUpdateRequestDto request, Optional<PasswordGenSettings> passwordGenSettings) {
+    private PasswordGenSettings updatePasswordGenSettingsEntity(PasswordGenSettingsUpdateRequestDto request, Optional<PasswordGenSettings> passwordGenSettings) {
         if(passwordGenSettings.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password Settings not found for this user");
 
@@ -74,6 +70,7 @@ public class PasswordGenSettingsService {
 
         if(request.getHasUppercase() != null)
             foundSettings.setHasUppercase(request.getHasUppercase());
+
         return foundSettings;
     }
 
@@ -91,9 +88,8 @@ public class PasswordGenSettingsService {
         return actualPasswordLength;
     }
 
-    public ResponseEntity<PasswordGenSettingsGetResponseDto> getPasswordGenSettings(String jwtToken) {
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
+    public ResponseEntity<PasswordGenSettingsGetResponseDto> updatePasswordGenSettingsEntity(String jwtToken) {
+        Long userId = authContextService.extractUserIdFromToken(jwtToken);
 
         Optional<PasswordGenSettings> foundSettings = passwordGenSettingsRepository.findById(userId);
 

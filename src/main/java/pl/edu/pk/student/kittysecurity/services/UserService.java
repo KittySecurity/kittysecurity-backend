@@ -1,7 +1,6 @@
 package pl.edu.pk.student.kittysecurity.services;
 
 import io.micrometer.common.util.StringUtils;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,28 +12,24 @@ import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateRequestDto;
 import pl.edu.pk.student.kittysecurity.dto.user.UserUpdateResponseDto;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.exception.custom.PasswordMatchException;
-import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 import pl.edu.pk.student.kittysecurity.repository.UserRepository;
-import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
-import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepo;
-    private final JwtService jwtService;
     private final BCryptPasswordEncoder encoder;
+    private final AuthContextService authContext;
 
-    public UserService(UserRepository userRepo, JwtService jwtService, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepo, AuthContextService authContext, BCryptPasswordEncoder encoder) {
         this.userRepo = userRepo;
-        this.jwtService = jwtService;
+        this.authContext = authContext;
         this.encoder = encoder;
     }
 
     public ResponseEntity<UserResponseDto> getUserDataByJwt(String jwtToken) {
-
-        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
         return ResponseEntity.ok().body(UserResponseDto.builder()
                 .email(foundUser.getEmail())
@@ -46,17 +41,20 @@ public class UserService {
         );
     }
 
-    private User findUserById(Long userId){
-        Optional<User> foundUser = userRepo.findById(userId);
+    public ResponseEntity<UserUpdateResponseDto> updateUserByJwt(String jwtToken, UserUpdateRequestDto request) {
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
-        if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
+        User updatedUser = userRepo.save(updateUserEntity(foundUser, request));
 
-        return foundUser.get();
+        return ResponseEntity.ok(UserUpdateResponseDto.builder()
+                .status("Success!")
+                .displayName(updatedUser.getDisplayName())
+                .email(updatedUser.getEmail())
+                .updatedAt(updatedUser.getUpdatedAt().toEpochMilli())
+                .build());
     }
 
-    public ResponseEntity<UserUpdateResponseDto> updateUserByJwt(String jwtToken, @Valid UserUpdateRequestDto request) {
-        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
-
+    private User updateUserEntity(User foundUser, UserUpdateRequestDto request){
         if(!StringUtils.isBlank(request.getDisplayName()))
             foundUser.setDisplayName(request.getDisplayName());
 
@@ -66,25 +64,18 @@ public class UserService {
         if(!StringUtils.isBlank(request.getMasterHash()))
             foundUser.setMasterHash(encoder.encode(request.getMasterHash()));
 
-        User updatedUser = userRepo.save(foundUser);
-
-        return ResponseEntity.ok(UserUpdateResponseDto.builder()
-                .status("OK")
-                .displayName(updatedUser.getDisplayName())
-                .email(updatedUser.getEmail())
-                .updatedAt(updatedUser.getUpdatedAt().toEpochMilli())
-                .build());
+        return foundUser;
     }
 
     @Transactional
     public ResponseEntity<StatusResponseDto> deleteUserByJwt(String jwtToken, DeleteUserRequestDto request) {
-        User foundUser = findUserById(jwtService.extractUserId(JwtUtils.cleanToken(jwtToken)));
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
         if(encoder.matches(request.getMasterHash(), foundUser.getMasterHash())) userRepo.delete(foundUser);
         else throw new PasswordMatchException("Passwords do not match!");
 
         return ResponseEntity.ok().body(StatusResponseDto.builder()
-                .status("OK")
+                .status("Success!")
                 .build());
     }
 }
