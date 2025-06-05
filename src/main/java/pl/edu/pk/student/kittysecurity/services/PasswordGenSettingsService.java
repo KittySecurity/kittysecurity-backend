@@ -17,11 +17,11 @@ import java.util.Optional;
 @Service
 public class PasswordGenSettingsService {
 
-    private final JwtService jwtService;
+    private final AuthContextService authContextService;
     private final PasswordGenSettingsRepository passwordGenSettingsRepository;
 
-    public PasswordGenSettingsService(JwtService jwtService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
-        this.jwtService = jwtService;
+    public PasswordGenSettingsService(AuthContextService authContextService, PasswordGenSettingsRepository passwordGenSettingsRepository) {
+        this.authContextService = authContextService;
         this.passwordGenSettingsRepository = passwordGenSettingsRepository;
     }
 
@@ -32,8 +32,7 @@ public class PasswordGenSettingsService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Given configuration exceeds password length!");
         }
 
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
+        Long userId = authContextService.extractUserIdFromToken(jwtToken);
 
         Optional<PasswordGenSettings> passwordGenSettings = passwordGenSettingsRepository.findById(userId);
 
@@ -91,8 +90,7 @@ public class PasswordGenSettingsService {
     }
 
     public ResponseEntity<PasswordGenSettingsGetResponseDto> updatePasswordGenSettingsEntity(String jwtToken) {
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
+        Long userId = authContextService.extractUserIdFromToken(jwtToken);
 
         Optional<PasswordGenSettings> foundSettings = passwordGenSettingsRepository.findById(userId);
 

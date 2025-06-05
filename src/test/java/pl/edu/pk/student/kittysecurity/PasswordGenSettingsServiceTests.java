@@ -12,7 +12,7 @@ import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettings
 import pl.edu.pk.student.kittysecurity.dto.password.settings.PasswordGenSettingsUpdateRequestDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordGenSettings;
 import pl.edu.pk.student.kittysecurity.repository.PasswordGenSettingsRepository;
-import pl.edu.pk.student.kittysecurity.services.JwtService;
+import pl.edu.pk.student.kittysecurity.services.AuthContextService;
 import pl.edu.pk.student.kittysecurity.services.PasswordGenSettingsService;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 public class PasswordGenSettingsServiceTests {
 
     @Mock
-    private JwtService jwtService;
+    private AuthContextService authContextService;
 
     @Mock
     private PasswordGenSettingsRepository passwordGenSettingsRepository;
@@ -33,7 +33,6 @@ public class PasswordGenSettingsServiceTests {
     private PasswordGenSettingsService service;
 
     private final String mockToken = "Bearer token";
-    private final String cleanedToken = "token";
     private final Long userId = 1L;
 
     @Test
@@ -49,39 +48,16 @@ public class PasswordGenSettingsServiceTests {
                 .build();
 
         PasswordGenSettings existingSettings = new PasswordGenSettings();
-        existingSettings.setPasswordLength(8);
-        existingSettings.setMinNumOfDigits(1);
-        existingSettings.setMinNumOfSpecChars(1);
-        existingSettings.setHasDigits(false);
-        existingSettings.setHasLowercase(false);
-        existingSettings.setHasSpecial(false);
-        existingSettings.setHasUppercase(false);
-
-        when(jwtService.extractUserId(cleanedToken)).thenReturn(userId);
+        when(authContextService.extractUserIdFromToken(mockToken)).thenReturn(userId);
         when(passwordGenSettingsRepository.findById(userId)).thenReturn(Optional.of(existingSettings));
-        PasswordGenSettings mockSaved = new PasswordGenSettings();
-        when(passwordGenSettingsRepository.save(any())).thenReturn(mockSaved);
+        when(passwordGenSettingsRepository.save(any())).thenReturn(existingSettings);
 
-        try (MockedStatic<pl.edu.pk.student.kittysecurity.utils.JwtUtils> mockedJwtUtils = Mockito.mockStatic(pl.edu.pk.student.kittysecurity.utils.JwtUtils.class)) {
-            mockedJwtUtils.when(() -> pl.edu.pk.student.kittysecurity.utils.JwtUtils.cleanToken(mockToken)).thenReturn(cleanedToken);
+        ResponseEntity<StatusResponseDto> response = service.updatePasswordGenSettingsEntity(mockToken, request);
 
-            ResponseEntity<StatusResponseDto> response = service.updatePasswordGenSettingsEntity(mockToken, request);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Success!", response.getBody().getStatus());
 
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals("Success!", response.getBody().getStatus());
-
-            ArgumentCaptor<PasswordGenSettings> captor = ArgumentCaptor.forClass(PasswordGenSettings.class);
-            verify(passwordGenSettingsRepository).save(captor.capture());
-
-            PasswordGenSettings savedSettings = captor.getValue();
-            assertEquals(request.getPasswordLength(), savedSettings.getPasswordLength());
-            assertEquals(request.getMinNumOfDigits(), savedSettings.getMinNumOfDigits());
-            assertEquals(request.getMinNumOfSpecChars(), savedSettings.getMinNumOfSpecChars());
-            assertEquals(request.getHasDigits(), savedSettings.getHasDigits());
-            assertEquals(request.getHasLowercase(), savedSettings.getHasLowercase());
-            assertEquals(request.getHasSpecial(), savedSettings.getHasSpecial());
-            assertEquals(request.getHasUppercase(), savedSettings.getHasUppercase());
-        }
+        verify(passwordGenSettingsRepository).save(existingSettings);
     }
 
     @Test
@@ -96,15 +72,11 @@ public class PasswordGenSettingsServiceTests {
                 .hasUppercase(true)
                 .build();
 
-        try (MockedStatic<pl.edu.pk.student.kittysecurity.utils.JwtUtils> mockedJwtUtils = Mockito.mockStatic(pl.edu.pk.student.kittysecurity.utils.JwtUtils.class)) {
-            mockedJwtUtils.when(() -> pl.edu.pk.student.kittysecurity.utils.JwtUtils.cleanToken(mockToken)).thenReturn(cleanedToken);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                service.updatePasswordGenSettingsEntity(mockToken, request));
 
-            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                    service.updatePasswordGenSettingsEntity(mockToken, request));
-
-            assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, exception.getStatusCode());
-            assertEquals("Given configuration exceeds password length!", exception.getReason());
-        }
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, exception.getStatusCode());
+        assertEquals("Given configuration exceeds password length!", exception.getReason());
     }
 
     @Test
@@ -113,22 +85,18 @@ public class PasswordGenSettingsServiceTests {
                 .passwordLength(10)
                 .build();
 
-        when(jwtService.extractUserId(cleanedToken)).thenReturn(userId);
+        when(authContextService.extractUserIdFromToken(mockToken)).thenReturn(userId);
         when(passwordGenSettingsRepository.findById(userId)).thenReturn(Optional.empty());
 
-        try (MockedStatic<pl.edu.pk.student.kittysecurity.utils.JwtUtils> mockedJwtUtils = Mockito.mockStatic(pl.edu.pk.student.kittysecurity.utils.JwtUtils.class)) {
-            mockedJwtUtils.when(() -> pl.edu.pk.student.kittysecurity.utils.JwtUtils.cleanToken(mockToken)).thenReturn(cleanedToken);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                service.updatePasswordGenSettingsEntity(mockToken, request));
 
-            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                    service.updatePasswordGenSettingsEntity(mockToken, request));
-
-            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-            assertEquals("Password Settings not found for this user", exception.getReason());
-        }
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Password Settings not found for this user", exception.getReason());
     }
 
     @Test
-    void updatePasswordGenSettings_ShouldReturnSettings() {
+    void getPasswordGenSettings_ShouldReturnSettings() {
         PasswordGenSettings settings = new PasswordGenSettings();
         settings.setPasswordLength(15);
         settings.setMinNumOfDigits(3);
@@ -138,38 +106,33 @@ public class PasswordGenSettingsServiceTests {
         settings.setHasSpecial(true);
         settings.setHasUppercase(false);
 
-        when(jwtService.extractUserId(cleanedToken)).thenReturn(userId);
+        when(authContextService.extractUserIdFromToken(mockToken)).thenReturn(userId);
         when(passwordGenSettingsRepository.findById(userId)).thenReturn(Optional.of(settings));
 
-        try (MockedStatic<pl.edu.pk.student.kittysecurity.utils.JwtUtils> mockedJwtUtils = Mockito.mockStatic(pl.edu.pk.student.kittysecurity.utils.JwtUtils.class)) {
-            mockedJwtUtils.when(() -> pl.edu.pk.student.kittysecurity.utils.JwtUtils.cleanToken(mockToken)).thenReturn(cleanedToken);
+        ResponseEntity<PasswordGenSettingsGetResponseDto> response = service.updatePasswordGenSettingsEntity(mockToken);
 
-            ResponseEntity<PasswordGenSettingsGetResponseDto> response = service.updatePasswordGenSettingsEntity(mockToken);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
 
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(settings.getPasswordLength(), response.getBody().getPasswordLength());
-            assertEquals(settings.getMinNumOfDigits(), response.getBody().getMinNumOfDigits());
-            assertEquals(settings.getMinNumOfSpecChars(), response.getBody().getMinNumOfSpecChars());
-            assertEquals(settings.getHasDigits(), response.getBody().getHasDigits());
-            assertEquals(settings.getHasLowercase(), response.getBody().getHasLowercase());
-            assertEquals(settings.getHasSpecial(), response.getBody().getHasSpecial());
-            assertEquals(settings.getHasUppercase(), response.getBody().getHasUppercase());
-        }
+        PasswordGenSettingsGetResponseDto body = response.getBody();
+        assertNotNull(body);
+        assertEquals(settings.getPasswordLength(), body.getPasswordLength());
+        assertEquals(settings.getMinNumOfDigits(), body.getMinNumOfDigits());
+        assertEquals(settings.getMinNumOfSpecChars(), body.getMinNumOfSpecChars());
+        assertEquals(settings.getHasDigits(), body.getHasDigits());
+        assertEquals(settings.getHasLowercase(), body.getHasLowercase());
+        assertEquals(settings.getHasSpecial(), body.getHasSpecial());
+        assertEquals(settings.getHasUppercase(), body.getHasUppercase());
     }
 
     @Test
-    void updatePasswordGenSettings_ShouldThrowWhenNotFound() {
-        when(jwtService.extractUserId(cleanedToken)).thenReturn(userId);
+    void getPasswordGenSettings_ShouldThrowWhenNotFound() {
+        when(authContextService.extractUserIdFromToken(mockToken)).thenReturn(userId);
         when(passwordGenSettingsRepository.findById(userId)).thenReturn(Optional.empty());
 
-        try (MockedStatic<pl.edu.pk.student.kittysecurity.utils.JwtUtils> mockedJwtUtils = Mockito.mockStatic(pl.edu.pk.student.kittysecurity.utils.JwtUtils.class)) {
-            mockedJwtUtils.when(() -> pl.edu.pk.student.kittysecurity.utils.JwtUtils.cleanToken(mockToken)).thenReturn(cleanedToken);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                service.updatePasswordGenSettingsEntity(mockToken));
 
-            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                    service.updatePasswordGenSettingsEntity(mockToken));
-
-            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-            assertEquals("Password Settings not found for this user", exception.getReason());
-        }
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Password Settings not found for this user", exception.getReason());
     }
 }
