@@ -25,7 +25,7 @@ public class PasswordGenSettingsService {
         this.passwordGenSettingsRepository = passwordGenSettingsRepository;
     }
 
-    public ResponseEntity<StatusResponseDto> updatePasswordGenSettings(String jwtToken, PasswordGenSettingsUpdateRequestDto request) {
+    public ResponseEntity<StatusResponseDto> updatePasswordGenSettingsEntity(String jwtToken, PasswordGenSettingsUpdateRequestDto request) {
         int calculatedPasswordLength = calculatePasswordLength(request);
 
         if(calculatedPasswordLength > request.getPasswordLength()){
@@ -37,9 +37,7 @@ public class PasswordGenSettingsService {
 
         Optional<PasswordGenSettings> passwordGenSettings = passwordGenSettingsRepository.findById(userId);
 
-
-
-        PasswordGenSettings foundSettings = getPasswordGenSettings(request, passwordGenSettings);
+        PasswordGenSettings foundSettings = updatePasswordGenSettingsEntity(request, passwordGenSettings);
 
         passwordGenSettingsRepository.save(foundSettings);
 
@@ -48,7 +46,7 @@ public class PasswordGenSettingsService {
                 .build());
     }
 
-    private PasswordGenSettings getPasswordGenSettings(PasswordGenSettingsUpdateRequestDto request, Optional<PasswordGenSettings> passwordGenSettings) {
+    private PasswordGenSettings updatePasswordGenSettingsEntity(PasswordGenSettingsUpdateRequestDto request, Optional<PasswordGenSettings> passwordGenSettings) {
         if(passwordGenSettings.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Password Settings not found for this user");
 
@@ -74,6 +72,7 @@ public class PasswordGenSettingsService {
 
         if(request.getHasUppercase() != null)
             foundSettings.setHasUppercase(request.getHasUppercase());
+
         return foundSettings;
     }
 
@@ -91,7 +90,7 @@ public class PasswordGenSettingsService {
         return actualPasswordLength;
     }
 
-    public ResponseEntity<PasswordGenSettingsGetResponseDto> getPasswordGenSettings(String jwtToken) {
+    public ResponseEntity<PasswordGenSettingsGetResponseDto> updatePasswordGenSettingsEntity(String jwtToken) {
         String cleanedToken = JwtUtils.cleanToken(jwtToken);
         Long userId = jwtService.extractUserId(cleanedToken);
 

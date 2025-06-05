@@ -21,11 +21,11 @@ public class PasswordGenSettingsController {
 
     @GetMapping
     public ResponseEntity<PasswordGenSettingsGetResponseDto> getPasswordGenSettings(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken){
-        return settingsService.getPasswordGenSettings(jwtToken);
+        return settingsService.updatePasswordGenSettingsEntity(jwtToken);
     }
 
     @PutMapping
     public ResponseEntity<StatusResponseDto> updatePasswordGenSettings(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken, @RequestBody  @Valid PasswordGenSettingsUpdateRequestDto request){
-        return settingsService.updatePasswordGenSettings(jwtToken, request);
+        return settingsService.updatePasswordGenSettingsEntity(jwtToken, request);
     }
 }

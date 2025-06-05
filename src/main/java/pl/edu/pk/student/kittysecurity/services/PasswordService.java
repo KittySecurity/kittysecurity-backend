@@ -12,10 +12,7 @@ import pl.edu.pk.student.kittysecurity.dto.password.PasswordEntryDto;
 import pl.edu.pk.student.kittysecurity.entity.PasswordEntry;
 import pl.edu.pk.student.kittysecurity.entity.User;
 import pl.edu.pk.student.kittysecurity.exception.custom.PasswordNotFoundException;
-import pl.edu.pk.student.kittysecurity.exception.custom.UserNotFoundException;
 import pl.edu.pk.student.kittysecurity.repository.PasswordEntryRepository;
-import pl.edu.pk.student.kittysecurity.repository.UserRepository;
-import pl.edu.pk.student.kittysecurity.utils.JwtUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,22 +21,17 @@ import java.util.stream.Collectors;
 @Service
 public class PasswordService {
 
-    private final UserRepository userRepo;
-    private final JwtService jwtService;
+    private final AuthContextService authContext;
     private final PasswordEntryRepository passwordEntryRepository;
 
-    public PasswordService(UserRepository userRepo, JwtService jwtService, PasswordEntryRepository passwordEntryRepository) {
-        this.userRepo = userRepo;
-        this.jwtService = jwtService;
+    public PasswordService(PasswordEntryRepository passwordEntryRepository, AuthContextService authContext) {
         this.passwordEntryRepository = passwordEntryRepository;
+        this.authContext = authContext;
     }
 
     @Transactional
     public ResponseEntity<CreatePasswordResponseDto> addPasswordByJwt(String jwtToken, CreatePasswordRequestDto request) {
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
-
-        User foundUser = findUserById(userId);
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
         PasswordEntry entry = PasswordEntry.builder()
                 .user(foundUser)
@@ -64,20 +56,8 @@ public class PasswordService {
         );
     }
 
-    //TODO: REFACTOR THIS XD DUPLICATE IN USERRSERVICE
-    private User findUserById(Long userId){
-        Optional<User> foundUser = userRepo.findById(userId);
-
-        if(foundUser.isEmpty()) throw new UserNotFoundException(userId);
-
-        return foundUser.get();
-    }
-
     public ResponseEntity<List<PasswordEntryDto>> getAllPasswordsByJwt(String jwtToken) {
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
-
-        User foundUser = findUserById(userId);
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
         List<PasswordEntry> entries = passwordEntryRepository.findByUser(foundUser);
 
@@ -110,10 +90,7 @@ public class PasswordService {
     }
 
     public ResponseEntity<PasswordEntryDto> getPasswordByIdAndJwt(String jwtToken, Long entryId) {
-        String cleanedToken = JwtUtils.cleanToken(jwtToken);
-        Long userId = jwtService.extractUserId(cleanedToken);
-
-        User foundUser = findUserById(userId);
+        User foundUser = authContext.getUserFromToken(jwtToken);
 
         Optional<PasswordEntry> entry = passwordEntryRepository.findByUserAndEntryId(foundUser, entryId);
 

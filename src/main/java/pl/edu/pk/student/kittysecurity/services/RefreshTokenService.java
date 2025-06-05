@@ -54,6 +54,7 @@ public class RefreshTokenService {
     private RefreshToken buildToken(User user) {
         String rawToken = generateRawToken();
         String hashedToken = encoder.encode(rawToken);
+
         return RefreshToken.builder()
                 .expiresAt(Instant.now().plus(REFRESH_TOKEN_VALIDITY_DAYS, ChronoUnit.DAYS))
                 .hashedToken(hashedToken)
@@ -80,6 +81,7 @@ public class RefreshTokenService {
 
         verifyExpirationDate(oldRefreshToken);
         refreshTokenRepository.delete(oldRefreshToken);
+
         return createRefreshToken(tokenOwner);
     }
 
