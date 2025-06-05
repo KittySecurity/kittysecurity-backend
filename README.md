@@ -63,6 +63,17 @@ spring.datasource.password=twoje_haslo
 ```
 Aplikacja będzie dostępna pod adresem: http://localhost:8080
 
+### 5. Example dockerfile usage
+Create image
+```
+mvn package
+docker image build -t kittysecurity:latest .
+```
+Run container
+```
+docker run -e DB_USERNAME=example_username -e DB_PASSWORD=example_password -e JWT_PROP_SECRETKEY=example_password -p 8080:8080 kittysecurity
+```
+
 ## 🔐 Uwierzytelnianie
 Projekt wykorzystuje JWT do uwierzytelniania użytkowników. Po zalogowaniu użytkownik otrzymuje token, który należy dołączać do nagłówków kolejnych żądań:
 ```
