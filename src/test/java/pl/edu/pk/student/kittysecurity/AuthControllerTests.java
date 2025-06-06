@@ -67,7 +67,7 @@ public class AuthControllerTests {
 
         String content = objectWriter.writeValueAsString(request);
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/register")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content);
@@ -100,7 +100,7 @@ public class AuthControllerTests {
 
         String content = objectWriter.writeValueAsString(request);
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/login")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content);
@@ -123,7 +123,7 @@ public class AuthControllerTests {
 
         Mockito.doNothing().when(authService).revokeToken(Mockito.anyString());
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/logout")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request));
@@ -149,7 +149,7 @@ public class AuthControllerTests {
         Mockito.when(authService.refreshToken(Mockito.anyString()))
                 .thenReturn(ResponseEntity.ok(response));
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/auth/refreshToken")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/auth/refreshToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request));

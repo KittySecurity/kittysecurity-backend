@@ -12,6 +12,7 @@ import lombok.*;
 public class LoginRequestDto {
 
     @NotBlank(message = "Email cannot be blank!")
+    @JsonProperty("email")
     private String email;
 
     @NotBlank(message = "MasterHash cannot be blank!")

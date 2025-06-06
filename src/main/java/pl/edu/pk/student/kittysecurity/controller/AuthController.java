@@ -10,7 +10,7 @@ import pl.edu.pk.student.kittysecurity.services.AuthService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     AuthService authService;
