@@ -14,7 +14,7 @@ public class PasswordGenSettingsGetResponseDto {
     @JsonProperty("minNumbers")
     private Integer minNumOfDigits;
 
-    @JsonProperty("minSpecials")
+    @JsonProperty("minSpecial")
     private Integer minNumOfSpecChars;
 
     @JsonProperty("lowercase")
@@ -23,7 +23,7 @@ public class PasswordGenSettingsGetResponseDto {
     @JsonProperty("uppercase")
     private Boolean hasUppercase;
 
-    @JsonProperty("specials")
+    @JsonProperty("special")
     private Boolean hasSpecial;
 
     @JsonProperty("numbers")

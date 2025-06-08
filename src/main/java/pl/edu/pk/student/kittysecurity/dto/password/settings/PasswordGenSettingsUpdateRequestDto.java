@@ -26,7 +26,7 @@ public class PasswordGenSettingsUpdateRequestDto {
 
     @Min(value = 1, message = "Password should contain at least 1 special character")
     @Max(value = 9, message = "Password can contain 9 special characters at maximum")
-    @JsonProperty("minSpecials")
+    @JsonProperty("minSpecial")
     private Integer minNumOfSpecChars;
 
     @JsonProperty("lowercase")
@@ -35,7 +35,7 @@ public class PasswordGenSettingsUpdateRequestDto {
     @JsonProperty("uppercase")
     private Boolean hasUppercase;
 
-    @JsonProperty("specials")
+    @JsonProperty("special")
     private Boolean hasSpecial;
 
     @JsonProperty("numbers")
